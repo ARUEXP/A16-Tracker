@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>A16 AnimeTracker — Discover • Track • Local</title>
+    <meta
+      name="description"
+      content="Android 16 Material Expressive Anime Tracker — AniList-backed discovery, localStorage sync."
+    />
+
+    <!-- Fonts -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Poppins:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Material Symbols & Font Awesome -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+      crossorigin="anonymous"
+    />
+
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <body>
+    <div id="app" class="app">
+      <header class="topbar">
+        <div class="brand">
+          <div class="logo">A16</div>
+          <div class="brand-text">
+            <h1>A16 <span>Anime</span></h1>
+            <p class="muted">Track • Discover • Local</p>
+          </div>
+        </div>
+
+        <nav class="tabs" role="tablist" aria-label="Main tabs">
+          <button class="tab active" data-tab="tracker">Tracker</button>
+          <button class="tab" data-tab="discover">Discover</button>
+          <button class="tab" data-tab="search">Search</button>
+          <!-- settings tab removed -->
+        </nav>
+
+        <div class="top-actions">
+          <div class="search-quick">
+            <input
+              id="quickSearch"
+              type="search"
+              placeholder="Quick search (local)"
+              aria-label="Quick search"
+            />
+            <button
+              id="clearQuick"
+              title="Clear quick search"
+              aria-label="Clear quick search"
+            >
+              <span class="material-symbols-outlined">close</span>
+            </button>
+          </div>
+          <button id="themeToggle" class="icon-btn" title="Toggle theme">
+            <span class="material-symbols-outlined">dark_mode</span>
+          </button>
+          <button id="addBtn" class="btn primary">+ Add</button>
+        </div>
+      </header>
+
+      <main class="main">
+        <!-- left sidebar -->
+        <aside class="sidebar">
+          <div class="panel profile">
+            <div class="avatar">Ɐ</div>
+            <div>
+              <strong>Local User</strong>
+              <div class="muted">Offline profile</div>
+            </div>
+          </div>
+
+          <div class="panel stats" id="sideStats">
+            <!-- stats injected -->
+          </div>
+
+          <div class="panel filters">
+            <h4>Filters</h4>
+            <select id="statusFilter">
+              <option value="all">All statuses</option>
+              <option value="watching">Watching</option>
+              <option value="completed">Completed</option>
+              <option value="onhold">On Hold</option>
+              <option value="dropped">Dropped</option>
+              <option value="plan">Plan to Watch</option>
+            </select>
+            <label
+              ><input id="onlyPoster" type="checkbox" /> Only with poster</label
+            >
+            <label
+              ><input id="autoAddCover" type="checkbox" checked /> Auto-fetch
+              cover when adding</label
+            >
+          </div>
+
+          <div class="panel small">
+            <button id="exportBtn" class="btn ghost">Export JSON</button>
+            <button id="importBtn" class="btn ghost">Import JSON</button>
+            <button id="clearBtn" class="btn outline">Clear Local Data</button>
+          </div>
+
+          <p class="foot muted">
+            Powered by AniList (GraphQL) • Covers & banners from AniList images
+          </p>
+        </aside>
+
+        <!-- content area -->
+        <section class="content">
+          <!-- Tracker tab -->
+          <section id="tracker" class="tab-panel active">
+            <div class="controls panel">
+              <div>
+                <label
+                  >Sort
+                  <select id="sortBy">
+                    <option value="recent">Recently added</option>
+                    <option value="alpha">Title A→Z</option>
+                    <option value="progress">Progress ↓</option>
+                    <option value="rating">Rating ↓</option>
+                  </select>
+                </label>
+              </div>
+              <div>
+                <input id="globalSearch" placeholder="Search local list..." />
+              </div>
+            </div>
+
+            <div id="trackerGrid" class="grid"></div>
+            <div id="trackerEmpty" class="empty panel">
+              <img
+                src="https://images.unsplash.com/photo-1541562232579-512a21360020?auto=format&fit=crop&w=1200&q=80"
+                alt="empty"
+              />
+              <div>
+                <h3>No anime yet</h3>
+                <p class="muted">
+                  Add or import to get started. Use Discover for
+                  recommendations.
+                </p>
+                <div style="margin-top: 10px">
+                  <button id="openAdd1" class="btn primary">Add Anime</button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Discover tab -->
+          <section id="discover" class="tab-panel">
+            <div class="panel discover-controls">
+              <label
+                >Region:
+                <select id="discoverRegion">
+                  <option value="global">Global</option>
+                </select></label
+              >
+              <label
+                >Limit:
+                <select id="discoverLimit">
+                  <option>8</option>
+                  <option>12</option>
+                  <option>24</option>
+                </select></label
+              >
+              <button id="refreshDiscover" class="btn ghost">Refresh</button>
+            </div>
+
+            <div id="discoverSections" class="discover-sections">
+              <!-- Trending -->
+              <div class="section panel">
+                <h3>Trending</h3>
+                <div id="trendingGrid" class="grid small-grid">
+                  <div class="loader">Loading...</div>
+                </div>
+              </div>
+
+              <!-- Popular -->
+              <div class="section panel">
+                <h3>Popular</h3>
+                <div id="popularGrid" class="grid small-grid">
+                  <div class="loader">Loading...</div>
+                </div>
+              </div>
+
+              <!-- New / Upcoming -->
+              <div class="section panel">
+                <h3>New & Upcoming</h3>
+                <div id="newGrid" class="grid small-grid">
+                  <div class="loader">Loading...</div>
+                </div>
+              </div>
+
+              <!-- Top Rated -->
+              <div class="section panel">
+                <h3>Top Rated</h3>
+                <div id="topGrid" class="grid small-grid">
+                  <div class="loader">Loading...</div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Search tab -->
+          <section id="search" class="tab-panel">
+            <div class="panel">
+              <form id="searchForm" class="search-form">
+                <input
+                  id="searchQuery"
+                  placeholder="Search AniList for anime (title, synonyms)..."
+                />
+                <select id="searchLimit">
+                  <option>8</option>
+                  <option>12</option>
+                  <option>24</option>
+                </select>
+                <button class="btn primary">Search</button>
+              </form>
+            </div>
+            <div id="searchResults" class="grid"></div>
+          </section>
+
+          <!-- Settings removed -->
+        </section>
+      </main>
+
+      <!-- Add/Edit modal -->
+      <div id="modal" class="modal" aria-hidden="true">
+        <div class="sheet">
+          <header class="sheet-head">
+            <h3 id="modalTitle">Add Anime</h3>
+            <div>
+              <button id="modalClose" class="icon-btn" aria-label="Close modal">
+                <span class="material-symbols-outlined">close</span>
+              </button>
+            </div>
+          </header>
+          <form id="animeForm" class="sheet-body">
+            <div class="form-grid">
+              <label>Title <input name="title" required /></label>
+              <label>Alt Title <input name="alt" /></label>
+              <label
+                >Cover URL
+                <input
+                  name="image"
+                  placeholder="Optional - auto fetched from AniList if blank"
+              /></label>
+              <label
+                >Total Episodes
+                <input name="total" type="number" min="1" value="12"
+              /></label>
+              <label
+                >Episodes Watched
+                <input name="watched" type="number" min="0" value="0"
+              /></label>
+              <label
+                >Status
+                <select name="status">
+                  <option value="watching">Watching</option>
+                  <option value="completed">Completed</option>
+                  <option value="onhold">On Hold</option>
+                  <option value="dropped">Dropped</option>
+                  <option value="plan">Plan to Watch</option>
+                </select>
+              </label>
+              <label
+                >Rating
+                <select name="rating">
+                  <option value="">—</option>
+                  <option>10</option>
+                  <option>9</option>
+                  <option>8</option>
+                  <option>7</option>
+                  <option>6</option>
+                  <option>5</option>
+                  <option>4</option>
+                  <option>3</option>
+                  <option>2</option>
+                  <option>1</option>
+                </select>
+              </label>
+            </div>
+
+            <div class="sheet-actions">
+              <button type="submit" class="btn primary">Save</button>
+              <button type="button" id="autoCoverBtn" class="btn ghost">
+                Auto Cover (AniList)
+              </button>
+              <button type="button" id="cancelBtn" class="btn outline">
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <input
+        id="importFile"
+        type="file"
+        accept="application/json"
+        style="display: none"
+      />
+      <div id="toast" class="toast" aria-live="polite"></div>
+    </div>
+
+    <!-- Main script -->
+    <script src="script.js" defer></script>
+  </body>
+</html>
