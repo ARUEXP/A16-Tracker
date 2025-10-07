@@ -19,9 +19,9 @@ const escape = (s) =>
   String(s || "").replace(
     /[&<>"']/g,
     (c) =>
-      ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[
-        c
-      ])
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[
+      c
+    ])
   );
 const uid = () =>
   "id" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
@@ -70,7 +70,7 @@ function cacheSet(key, data) {
   const obj = { ts: Date.now(), data };
   try {
     localStorage.setItem(cacheKey(key), JSON.stringify(obj));
-  } catch (e) {}
+  } catch (e) { }
 }
 function cacheGet(key) {
   try {
@@ -115,14 +115,7 @@ function init() {
     }
   });
 
-  // Theme & accent controls were removed from the UI. Keep a safe theme toggle if present.
-  const themeToggle = document.getElementById("themeToggle");
-  if (themeToggle)
-    themeToggle.addEventListener("click", () => {
-      const isLight = document.documentElement.classList.toggle("light");
-      settings.theme = isLight ? "light" : "dark";
-      saveSettings();
-    });
+  // Theme toggle removed from behavior: keep UI stable in dark-only mode.
 
   $("#quickSearch").addEventListener(
     "input",
@@ -166,15 +159,11 @@ function onTab(e) {
 
 /* ========== SETTINGS ========== */
 function applySettings() {
-  if (settings.theme === "light")
-    document.documentElement.classList.add("light");
-  else document.documentElement.classList.remove("light");
+  // Keep dark-only UI; still apply accent color if changed via settings
   document.documentElement.style.setProperty(
     "--accent",
     settings.accent || "#06b6d4"
   );
-  const themeSelect = document.getElementById("themeSelect");
-  if (themeSelect) themeSelect.value = settings.theme;
   const accentColor = document.getElementById("accentColor");
   if (accentColor) accentColor.value = settings.accent || "#06b6d4";
   const autoAddCover = document.getElementById("autoAddCover");
@@ -231,9 +220,8 @@ function cardFor(item) {
   meta.innerHTML = `<div class="title">${escape(
     item.title
   )}</div><div class="sub">${escape(item.alt || "")}</div>
-    <div class="small">Status: ${item.status} • ${item.watched}/${
-    item.total
-  } • Rating: ${item.rating || "—"}</div>
+    <div class="small">Status: ${item.status} • ${item.watched}/${item.total
+    } • Rating: ${item.rating || "—"}</div>
     <div class="pbar"><i style="width:${prog(item)}%"></i></div>
     <div style="display:flex;justify-content:space-between;margin-top:8px">
       <div style="display:flex;gap:8px"><button class="icon" data-act="inc">+</button><button class="icon" data-act="dec">−</button></div>
@@ -518,16 +506,13 @@ function renderDiscoverSection(containerId, items) {
     meta.innerHTML = `<div class="title">${escape(
       m.title?.romaji || m.title?.english
     )}</div>
-      <div class="sub">Episodes: ${m.episodes || "?"} • Score: ${
-      m.averageScore || "—"
-    }</div>
+      <div class="sub">Episodes: ${m.episodes || "?"} • Score: ${m.averageScore || "—"
+      }</div>
       <div style="margin-top:auto;display:flex;justify-content:space-between">
-        <button class="btn primary" data-id="${
-          m.id
-        }" data-action="add">Add</button>
-        <button class="btn ghost" data-id="${
-          m.id
-        }" data-action="view">View</button>
+        <button class="btn primary" data-id="${m.id
+      }" data-action="add">Add</button>
+        <button class="btn ghost" data-id="${m.id
+      }" data-action="view">View</button>
       </div>`;
     card.appendChild(poster);
     card.appendChild(meta);
@@ -597,14 +582,11 @@ async function onSearchForm(e) {
       meta.className = "meta";
       meta.innerHTML = `<div class="title">${escape(
         m.title?.romaji || m.title?.english
-      )}</div><div class="sub">Episodes: ${m.episodes || "?"} • Score: ${
-        m.averageScore || "—"
-      }</div>
-        <div style="margin-top:auto;display:flex;gap:8px"><button class="btn primary" data-id="${
-          m.id
-        }" data-action="add">Add</button><button class="btn ghost" data-id="${
-        m.id
-      }" data-action="view">View</button></div>`;
+      )}</div><div class="sub">Episodes: ${m.episodes || "?"} • Score: ${m.averageScore || "—"
+        }</div>
+        <div style="margin-top:auto;display:flex;gap:8px"><button class="btn primary" data-id="${m.id
+        }" data-action="add">Add</button><button class="btn ghost" data-id="${m.id
+        }" data-action="view">View</button></div>`;
       c.appendChild(p);
       c.appendChild(meta);
       container.appendChild(c);

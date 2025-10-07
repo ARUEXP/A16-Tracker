@@ -2,8 +2,10 @@
   --bg: #071026;
   --card: #0e1626;
   --muted: rgba(255, 255, 255, 0.78);
-  --accent: #06b6d4; /* teal */
-  --accent2: #9b6bff; /* violet accent for nicer gradient */
+  --accent: #06b6d4;
+  /* teal */
+  --accent2: #9b6bff;
+  /* violet accent for nicer gradient */
   --glass: rgba(255, 255, 255, 0.03);
   --radius: 12px;
   --elev1: 0 10px 30px rgba(3, 8, 20, 0.6);
@@ -14,13 +16,7 @@
   --body-font: "Poppins", sans-serif;
 }
 
-:root.light {
-  --bg: #f6f8fb;
-  --card: #ffffff;
-  --muted: #263238;
-  --glass: rgba(0, 0, 0, 0.04);
-  --toast-bg: rgba(0, 0, 0, 0.06);
-}
+/* Removed light theme to keep a single dark theme for simplicity and UX consistency */
 
 * {
   box-sizing: border-box;
@@ -43,7 +39,8 @@ body {
   font-family: var(--body-font);
   background: var(--bg);
   color: #eaf6fb;
-  padding: 18px;
+  padding: 12px;
+  /* slightly reduced padding for small screens */
   display: flex;
   justify-content: center;
 }
@@ -116,6 +113,7 @@ h6 {
 .tab-panel {
   display: none;
 }
+
 .tab-panel.active {
   display: block;
 }
@@ -140,14 +138,17 @@ h6 {
   flex-wrap: wrap;
   align-items: center;
 }
+
 .brand {
   flex: 0 1 auto;
 }
+
 .tabs {
   flex: 1 1 auto;
   display: flex;
   justify-content: center;
 }
+
 .top-actions {
   flex: 0 1 auto;
   display: flex;
@@ -219,11 +220,9 @@ select {
   -webkit-appearance: none;
   -moz-appearance: none;
   padding-right: 32px;
-  background-image: linear-gradient(
-      45deg,
+  background-image: linear-gradient(45deg,
       transparent 50%,
-      rgba(255, 255, 255, 0.6) 50%
-    ),
+      rgba(255, 255, 255, 0.6) 50%),
     linear-gradient(135deg, rgba(255, 255, 255, 0.6) 50%, transparent 50%);
   background-position: calc(100% - 14px) calc(1em + 2px),
     calc(100% - 10px) calc(1em + 2px);
@@ -328,7 +327,7 @@ input[type="number"]::-webkit-inner-spin-button {
   display: grid;
   grid-template-columns: 260px 1fr;
   gap: var(--gap);
-  margin-top: 14px;
+  margin-top: 12px;
 }
 
 .sidebar .panel {
@@ -389,11 +388,9 @@ input[type="number"]::-webkit-inner-spin-button {
 
 /* card */
 .card {
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.02),
-    rgba(255, 255, 255, 0.01)
-  );
+  background: linear-gradient(180deg,
+      rgba(255, 255, 255, 0.02),
+      rgba(255, 255, 255, 0.01));
   border-radius: 12px;
   overflow: hidden;
   display: flex;
@@ -447,7 +444,7 @@ input[type="number"]::-webkit-inner-spin-button {
   overflow: hidden;
 }
 
-.pbar > i {
+.pbar>i {
   display: block;
   height: 100%;
   background: linear-gradient(90deg, var(--accent), var(--accent2));
@@ -526,7 +523,7 @@ input[type="number"]::-webkit-inner-spin-button {
 }
 
 /* make empty content stack on small widths */
-.empty > div {
+.empty>div {
   max-width: 300px;
 }
 
@@ -541,6 +538,7 @@ input[type="number"]::-webkit-inner-spin-button {
   place-items: center;
   cursor: pointer;
 }
+
 .search-quick button:hover {
   background: rgba(255, 255, 255, 0.06);
 }
@@ -562,7 +560,8 @@ input[type="number"]::-webkit-inner-spin-button {
 }
 
 /* responsive */
-@media (max-width: 980px) {
+/* Make layout stack earlier on medium screens for better usability */
+@media (max-width: 900px) {
   .main {
     grid-template-columns: 1fr;
   }
@@ -581,6 +580,7 @@ input[type="number"]::-webkit-inner-spin-button {
 }
 
 @media (max-width: 720px) {
+
   /* stack topbar: brand on top, tabs and actions below */
   .tabs {
     order: 2;
@@ -588,14 +588,17 @@ input[type="number"]::-webkit-inner-spin-button {
     margin: 10px 0;
     justify-content: flex-start;
   }
+
   .top-actions {
     order: 3;
     width: 100%;
     justify-content: flex-end;
   }
+
   .search-quick input {
     width: 160px;
   }
+
   .brand {
     order: 1;
   }
@@ -607,8 +610,8 @@ input[type="number"]::-webkit-inner-spin-button {
 
   /* compact modal sheet on small devices */
   .sheet {
-    margin: 18px;
-    max-width: calc(100% - 36px);
+    margin: 14px;
+    max-width: calc(100% - 28px);
   }
 }
 
@@ -616,27 +619,49 @@ input[type="number"]::-webkit-inner-spin-button {
   .tabs {
     justify-content: center;
   }
+
   .search-quick input {
     width: 120px;
   }
+
   .btn {
     padding: 6px 10px;
   }
+
   .poster {
     padding-top: 130%;
   }
+
   .brand-text h1 {
     font-size: 18px;
   }
 }
 
+/* Make form and posters more compact on small devices */
 @media (max-width: 560px) {
   .form-grid {
     grid-template-columns: 1fr;
   }
 
   .poster {
-    padding-top: 130%;
+    padding-top: 120%;
+  }
+
+  .card {
+    min-height: 260px;
+    /* reduce card height slightly for small screens */
+  }
+}
+
+/* Improve card sizing on very narrow screens to avoid overflow */
+@media (max-width: 360px) {
+  .grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 10px;
+  }
+
+  .poster {
+    padding-top: 140%;
   }
 }
 
@@ -650,6 +675,7 @@ html {
   --motion: 160ms;
   --motion-ease: cubic-bezier(0.2, 0.9, 0.2, 1);
 }
+
 button,
 .btn,
 input,
@@ -669,13 +695,16 @@ select,
   opacity: 0;
   transition: opacity calc(var(--motion) * 1.2) var(--motion-ease);
 }
+
 .modal[aria-hidden="false"] {
   opacity: 1;
 }
+
 .sheet {
   transform: translateY(6px);
   transition: transform calc(var(--motion) * 1.2) var(--motion-ease);
 }
+
 .modal[aria-hidden="false"] .sheet {
   transform: translateY(0);
 }
@@ -688,6 +717,7 @@ select,
   transition: opacity calc(var(--motion) * 1.1) var(--motion-ease),
     transform calc(var(--motion) * 1.1) var(--motion-ease);
 }
+
 .tab-panel.active .panel,
 .tab-panel.active .grid {
   opacity: 1;
@@ -699,6 +729,7 @@ select,
   transition: opacity calc(var(--motion) * 1.2) var(--motion-ease),
     transform calc(var(--motion) * 1.2) var(--motion-ease);
 }
+
 .card:hover .poster img {
   transform: scale(1.02);
 }
@@ -713,6 +744,7 @@ body,
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
+
 html::-webkit-scrollbar,
 body::-webkit-scrollbar,
 .content::-webkit-scrollbar,
@@ -728,6 +760,7 @@ body::-webkit-scrollbar,
   :root {
     --motion: 1ms;
   }
+
   * {
     animation-duration: 1ms !important;
     transition-duration: 1ms !important;
