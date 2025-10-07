@@ -670,6 +670,57 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Prevent accidental horizontal overflow on small devices and allow flex children to shrink */
+html,
+body {
+  overflow-x: hidden;
+}
+
+/* Allow flex and grid children to shrink instead of overflowing */
+.topbar,
+.brand,
+.tabs,
+.top-actions,
+.content,
+.panel,
+.grid,
+.card,
+.meta,
+.brand-text {
+  min-width: 0;
+}
+
+/* Let tab list wrap onto multiple lines if needed */
+.tabs {
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* Prevent long titles from forcing width */
+.brand-text h1,
+.title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Make search input flexible and not force width */
+.search-quick {
+  max-width: 100%;
+}
+
+.search-quick input {
+  min-width: 0;
+  width: 100%;
+}
+
+/* Ensure images never exceed their containers */
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
 /* gentle default transitions for interactive properties */
 :root {
   --motion: 160ms;
