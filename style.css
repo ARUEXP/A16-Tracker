@@ -817,3 +817,58 @@ body::-webkit-scrollbar,
     transition-duration: 1ms !important;
   }
 }
+
+/* Target touch devices (large phones / high-res mobiles) and force a mobile-friendly layout
+   even if the device reports a large CSS width. This helps fold the sidebar and make
+   tap targets larger on high-density mobile screens. */
+@media (pointer: coarse) and (orientation: portrait) {
+  :root {
+    --gap: 12px;
+  }
+
+  body {
+    padding-left: env(safe-area-inset-left, 12px);
+    padding-right: env(safe-area-inset-right, 12px);
+  }
+
+  .main {
+    grid-template-columns: 1fr !important;
+    /* force single column on touch portrait */
+  }
+
+  .sidebar {
+    order: 2;
+    width: 100%;
+  }
+
+  .topbar .logo {
+    width: 48px;
+    height: 48px;
+  }
+
+  .tabs {
+    justify-content: flex-start !important;
+  }
+
+  /* Slightly larger buttons for easier tapping */
+  .btn,
+  .icon,
+  .icon-btn {
+    padding: 10px 14px;
+  }
+
+  .search-quick input {
+    width: 100%;
+  }
+}
+
+/* Also handle landscape on coarse pointers (e.g., large phones turned sideways) */
+@media (pointer: coarse) and (orientation: landscape) {
+  .main {
+    grid-template-columns: 1fr !important;
+  }
+
+  .tabs {
+    flex-wrap: wrap;
+  }
+}
