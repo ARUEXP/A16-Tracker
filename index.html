@@ -1,610 +1,411 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>A16 AnimeTracker — Discover • Track • Local</title>
-    <meta
-      name="description"
-      content="Android 16 Material Expressive Anime Tracker — AniList-backed discovery, localStorage sync."
-    />
-
-    <!-- Fonts -->
-    <link
-      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Poppins:wght@300;400;500;600&display=swap"
-      rel="stylesheet"
-    />
-
-    <!-- Material Symbols & Font Awesome -->
-    <link
-      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
-      rel="stylesheet"
-    />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>God Tier A16 Anime Tracker</title>
     <link
       rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
-      crossorigin="anonymous"
+      href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css"
     />
-
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="styles.css" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Bungee+Outline&display=swap"
+    />
   </head>
-
   <body>
-    <div id="app" class="app">
-      <header class="topbar">
-        <div class="brand" role="banner">
-          <a href="." class="logo-link" aria-label="A16 Anime Tracker Homepage">
-            <div class="logo">A16</div>
-          </a>
-          <div class="brand-text">
-            <h1>A16 <span class="accent">Anime</span></h1>
-            <p class="muted">Track • Discover • Local</p>
-          </div>
-        </div>
-
-        <nav class="tabs" role="tablist" aria-label="Main navigation">
-          <button
-            class="tab active"
-            role="tab"
-            aria-selected="true"
-            aria-controls="tracker"
-            data-tab="tracker"
-          >
-            <span class="material-symbols-outlined">format_list_bulleted</span>
-            <span>Tracker</span>
+    <div id="app">
+      <header>
+        <h1 class="expressive-title">
+          <span class="bungee-font">A16</span> Anime Tracker
+        </h1>
+        <nav>
+          <button class="tab active" data-tab="tracker" aria-selected="true">
+            <i class="mdi mdi-animation-play"></i> Tracker
           </button>
-          <button
-            class="tab"
-            role="tab"
-            aria-selected="false"
-            aria-controls="discover"
-            data-tab="discover"
-          >
-            <span class="material-symbols-outlined">explore</span>
-            <span>Discover</span>
+          <button class="tab" data-tab="discover" aria-selected="false">
+            <i class="mdi mdi-compass-outline"></i> Discover
           </button>
-          <button
-            class="tab"
-            role="tab"
-            aria-selected="false"
-            aria-controls="search"
-            data-tab="search"
-          >
-            <span class="material-symbols-outlined">search</span>
-            <span>Search</span>
+          <button class="tab" data-tab="search" aria-selected="false">
+            <i class="mdi mdi-magnify"></i> Search
+          </button>
+          <button class="tab" data-tab="settings" aria-selected="false">
+            <i class="mdi mdi-tune-vertical"></i> Settings
           </button>
         </nav>
+      </header>
 
-        <div class="top-actions">
-          <div class="search-quick" role="search">
-            <label class="sr-only" for="quickSearch">Quick search</label>
-            <div class="search-input-wrapper">
-              <span class="material-symbols-outlined search-icon">search</span>
+      <main>
+        <section id="tracker" class="tab-panel active">
+          <div class="controls-area">
+            <div class="filter-group">
               <input
+                type="text"
                 id="quickSearch"
-                type="search"
-                placeholder="Quick search your list..."
-                aria-label="Quick search"
-                autocomplete="off"
+                placeholder="Quick Filter by Title..."
+                class="m3-input"
               />
-              <button
-                id="clearQuick"
-                class="clear-btn"
-                type="button"
-                title="Clear search"
-                aria-label="Clear search"
-              >
-                <span class="material-symbols-outlined">close</span>
+              <button id="clearQuick" class="m3-icon-btn" title="Clear Search">
+                <i class="mdi mdi-close"></i>
+              </button>
+            </div>
+
+            <div class="filter-group">
+              <select id="statusFilter" class="m3-select">
+                <option value="all">Status: All</option>
+                <option value="watching">Watching</option>
+                <option value="completed">Completed</option>
+                <option value="plan">Plan to Watch</option>
+                <option value="dropped">Dropped</option>
+                <option value="paused">Paused</option>
+              </select>
+              <select id="sortBy" class="m3-select">
+                <option value="created">Sort By: Added</option>
+                <option value="alpha">Sort By: Title</option>
+                <option value="progress">Sort By: Progress</option>
+                <option value="rating">Sort By: Rating</option>
+              </select>
+              <label class="m3-checkbox-label">
+                <input type="checkbox" id="onlyPoster" />
+                <span class="m3-checkbox-custom"></span>
+                Only Posters
+              </label>
+            </div>
+          </div>
+
+          <div class="batch-actions-bar">
+            <div class="m3-chip">
+              <i class="mdi mdi-tools"></i> Batch Actions
+            </div>
+            <select id="batchStatus" class="m3-select small">
+              <option value="nochange">Change Status to...</option>
+              <option value="watching">Watching</option>
+              <option value="completed">Completed</option>
+              <option value="plan">Plan to Watch</option>
+              <option value="dropped">Dropped</option>
+              <option value="paused">Paused</option>
+            </select>
+            <input
+              type="number"
+              id="batchIncrement"
+              value="0"
+              min="0"
+              max="99"
+              placeholder="Episodes to Add"
+              class="m3-input small"
+            />
+            <button id="batchUpdateBtn" class="m3-button primary">
+              Apply to Selected
+            </button>
+          </div>
+
+          <div class="tracker-container">
+            <aside id="sideStats" class="m3-card stats-card"></aside>
+            <div id="trackerGrid" class="card-grid"></div>
+            <div id="trackerEmpty" class="empty-state">
+              <div class="empty">
+                <i class="mdi mdi-movie-search"></i>
+                <h3>No anime found</h3>
+                <p>Try adjusting your filters or add anime to your list</p>
+              </div>
+            </div>
+          </div>
+
+          <button id="addBtn" class="m3-fab extended primary">
+            <i class="mdi mdi-plus"></i> Add New Anime
+          </button>
+        </section>
+
+        <section id="discover" class="tab-panel">
+          <div class="controls-area discover-controls">
+            <div class="filter-group">
+              <select id="seasonFilter" class="m3-select">
+                <option value="all">Season: All</option>
+                <option value="WINTER">Winter</option>
+                <option value="SPRING">Spring</option>
+                <option value="SUMMER">Summer</option>
+                <option value="FALL">Fall</option>
+              </select>
+              <input
+                type="number"
+                id="yearFilter"
+                placeholder="Year"
+                value=""
+                min="1950"
+                max="2050"
+                class="m3-input small"
+              />
+              <select id="genreFilter" class="m3-select">
+                <option value="all">Genre: All</option>
+                <option value="Action">Action</option>
+                <option value="Adventure">Adventure</option>
+                <option value="Comedy">Comedy</option>
+                <option value="Drama">Drama</option>
+                <option value="Fantasy">Fantasy</option>
+                <option value="Mecha">Mecha</option>
+                <option value="Romance">Romance</option>
+                <option value="Sci-Fi">Sci-Fi</option>
+                <option value="Slice of Life">Slice of Life</option>
+              </select>
+              <input
+                type="number"
+                id="discoverLimit"
+                placeholder="Limit"
+                value="8"
+                min="4"
+                max="20"
+                class="m3-input small"
+              />
+            </div>
+            <button id="refreshDiscover" class="m3-button secondary">
+              <i class="mdi mdi-refresh"></i> Refresh
+            </button>
+          </div>
+
+          <div class="discover-grid-container">
+            <h2>Trending Now <i class="mdi mdi-fire"></i></h2>
+            <div id="trendingGrid" class="discover-grid card-grid"></div>
+
+            <h2>Most Popular <i class="mdi mdi-star-circle"></i></h2>
+            <div id="popularGrid" class="discover-grid card-grid"></div>
+
+            <h2>New Releases <i class="mdi mdi-new-box"></i></h2>
+            <div id="newGrid" class="discover-grid card-grid"></div>
+
+            <h2>Top Rated <i class="mdi mdi-crown"></i></h2>
+            <div id="topGrid" class="discover-grid card-grid"></div>
+          </div>
+        </section>
+
+        <section id="search" class="tab-panel">
+          <form id="searchForm" class="controls-area search-controls">
+            <div class="filter-group">
+              <input
+                type="text"
+                id="searchQuery"
+                placeholder="Search AniList..."
+                required
+                class="m3-input large"
+              />
+              <select id="searchSeason" class="m3-select">
+                <option value="all">Season: All</option>
+                <option value="WINTER">Winter</option>
+                <option value="SPRING">Spring</option>
+                <option value="SUMMER">Summer</option>
+                <option value="FALL">Fall</option>
+              </select>
+              <input
+                type="number"
+                id="searchYear"
+                placeholder="Year"
+                value=""
+                min="1950"
+                max="2050"
+                class="m3-input small"
+              />
+              <select id="searchGenre" class="m3-select">
+                <option value="all">Genre: All</option>
+                <option value="Action">Action</option>
+                <option value="Adventure">Adventure</option>
+                <option value="Comedy">Comedy</option>
+                <option value="Drama">Drama</option>
+                <option value="Fantasy">Fantasy</option>
+                <option value="Mecha">Mecha</option>
+                <option value="Romance">Romance</option>
+                <option value="Sci-Fi">Sci-Fi</option>
+                <option value="Slice of Life">Slice of Life</option>
+              </select>
+              <input
+                type="number"
+                id="searchLimit"
+                placeholder="Limit"
+                value="12"
+                min="1"
+                max="50"
+                class="m3-input small"
+              />
+            </div>
+            <button type="submit" class="m3-button primary">
+              <i class="mdi mdi-magnify"></i> Search
+            </button>
+          </form>
+
+          <div id="searchResults" class="card-grid search-results-grid">
+            <div class="empty-state">
+              <p>Enter a query and hit search to find anime on AniList.</p>
+            </div>
+          </div>
+        </section>
+
+        <section id="settings" class="tab-panel">
+          <div class="settings-grid">
+            <div class="m3-card settings-card">
+              <h3><i class="mdi mdi-cog"></i> General Settings</h3>
+              <form id="settingsForm">
+                <label class="m3-label"
+                  >Default Episodes for New Entries:</label
+                >
+                <input
+                  type="number"
+                  id="defaultEpisodes"
+                  name="defaultEpisodes"
+                  min="1"
+                  value="12"
+                  class="m3-input small"
+                />
+
+                <label class="m3-label"
+                  >Average Episode Duration (Minutes):</label
+                >
+                <input
+                  type="number"
+                  id="episodeDuration"
+                  name="episodeDuration"
+                  min="1"
+                  value="24"
+                  class="m3-input small"
+                />
+
+                <button type="submit" class="m3-button primary small">
+                  <i class="mdi mdi-content-save"></i> Save Settings
+                </button>
+              </form>
+            </div>
+
+            <div class="m3-card settings-card">
+              <h3><i class="mdi mdi-database"></i> Data Management</h3>
+              <p class="m3-label">Export/Import your tracker data.</p>
+              <div class="button-group">
+                <button id="exportBtn" class="m3-button secondary">
+                  <i class="mdi mdi-download"></i> Export JSON
+                </button>
+                <input
+                  type="file"
+                  id="importFile"
+                  accept="application/json"
+                  style="display: none"
+                />
+                <button id="importBtn" class="m3-button secondary">
+                  <i class="mdi mdi-upload"></i> Import JSON
+                </button>
+              </div>
+              <p class="m3-label danger-text">
+                Permanently delete all tracked anime.
+              </p>
+              <button id="clearBtn" class="m3-button danger">
+                <i class="mdi mdi-delete-forever"></i> Clear All Tracker Data
+              </button>
+            </div>
+
+            <div class="m3-card settings-card">
+              <h3><i class="mdi mdi-cached"></i> API Cache</h3>
+              <p class="m3-label">
+                Clearing cache forces a fresh data load from AniList.
+              </p>
+              <button id="clearCacheBtn" class="m3-button secondary">
+                <i class="mdi mdi-broom"></i> Clear AniList Cache
               </button>
             </div>
           </div>
-          <div class="action-buttons">
-            <button id="addBtn" class="btn primary">
-              <span class="material-symbols-outlined">add</span>
-              <span>Add Anime</span>
-            </button>
-          </div>
-        </div>
-      </header>
-
-      <main class="main">
-        <!-- left sidebar -->
-        <aside class="sidebar">
-          <div class="panel profile">
-            <div class="avatar">Ɐ</div>
-            <div>
-              <strong>Local User</strong>
-              <div class="muted">Offline profile</div>
-            </div>
-          </div>
-
-          <div class="panel stats" id="sideStats">
-            <!-- stats injected -->
-          </div>
-
-          <div class="panel filters">
-            <h4>Filters</h4>
-            <select id="statusFilter">
-              <option value="all">All statuses</option>
-              <option value="watching">Watching</option>
-              <option value="completed">Completed</option>
-              <option value="onhold">On Hold</option>
-              <option value="dropped">Dropped</option>
-              <option value="plan">Plan to Watch</option>
-            </select>
-            <label
-              ><input id="onlyPoster" type="checkbox" /> Only with poster</label
-            >
-            <label
-              ><input id="autoAddCover" type="checkbox" checked /> Auto-fetch
-              cover when adding</label
-            >
-          </div>
-
-          <div class="panel small">
-            <button id="exportBtn" class="btn ghost">Export JSON</button>
-            <button id="importBtn" class="btn ghost">Import JSON</button>
-            <button id="clearBtn" class="btn outline">Clear Local Data</button>
-          </div>
-
-          <p class="foot muted">
-            Powered by AniList (GraphQL) • Covers & banners from AniList images
-          </p>
-        </aside>
-
-        <!-- content area -->
-        <section class="content">
-          <!-- Tracker tab -->
-          <section id="tracker" class="tab-panel active">
-            <div class="controls panel">
-              <div>
-                <label
-                  >Sort
-                  <select id="sortBy">
-                    <option value="recent">Recently added</option>
-                    <option value="alpha">Title A→Z</option>
-                    <option value="progress">Progress ↓</option>
-                    <option value="rating">Rating ↓</option>
-                  </select>
-                </label>
-              </div>
-              <div>
-                <input id="globalSearch" placeholder="Search local list..." />
-              </div>
-            </div>
-
-            <div class="grid-container">
-              <div
-                id="trackerGrid"
-                class="grid"
-                role="grid"
-                aria-label="Anime list"
-              >
-                <!-- Grid items will be dynamically inserted here -->
-                <div class="grid-loader">
-                  <div class="skeleton-grid">
-                    <div class="skeleton-card" aria-hidden="true">
-                      <div class="skeleton-image"></div>
-                      <div class="skeleton-content">
-                        <div class="skeleton-title"></div>
-                        <div class="skeleton-text"></div>
-                        <div class="skeleton-text short"></div>
-                      </div>
-                    </div>
-                    <!-- Repeat skeleton cards for loading state -->
-                    <div class="skeleton-card" aria-hidden="true">
-                      <div class="skeleton-image"></div>
-                      <div class="skeleton-content">
-                        <div class="skeleton-title"></div>
-                        <div class="skeleton-text"></div>
-                        <div class="skeleton-text short"></div>
-                      </div>
-                    </div>
-                    <div class="skeleton-card" aria-hidden="true">
-                      <div class="skeleton-image"></div>
-                      <div class="skeleton-content">
-                        <div class="skeleton-title"></div>
-                        <div class="skeleton-text"></div>
-                        <div class="skeleton-text short"></div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div
-                id="trackerEmpty"
-                class="empty panel"
-                role="status"
-                aria-live="polite"
-              >
-                <img
-                  src="https://images.unsplash.com/photo-1541562232579-512a21360020?auto=format&fit=crop&w=1200&q=80"
-                  alt="Decorative empty state illustration"
-                  loading="lazy"
-                />
-                <div class="empty-content">
-                  <h3>Start Your Anime Collection</h3>
-                  <p class="muted">
-                    Ready to track your favorite anime? Add titles manually or
-                    import your list. Check out our Discover section for
-                    recommendations!
-                  </p>
-                  <div class="empty-actions">
-                    <button id="openAdd1" class="btn primary">
-                      <span class="material-symbols-outlined">add</span>
-                      <span>Add Your First Anime</span>
-                    </button>
-                    <button id="openDiscover" class="btn ghost">
-                      <span class="material-symbols-outlined">explore</span>
-                      <span>Browse Recommendations</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          <!-- Discover tab -->
-          <section id="discover" class="tab-panel">
-            <div class="panel discover-controls">
-              <label
-                >Region:
-                <select id="discoverRegion">
-                  <option value="global">Global</option>
-                </select></label
-              >
-              <label
-                >Limit:
-                <select id="discoverLimit">
-                  <option>8</option>
-                  <option>12</option>
-                  <option>24</option>
-                </select></label
-              >
-              <button id="refreshDiscover" class="btn ghost">Refresh</button>
-            </div>
-
-            <div id="discoverSections" class="discover-sections">
-              <!-- Trending -->
-              <section
-                class="discover-section panel"
-                aria-labelledby="trendingTitle"
-              >
-                <header class="section-header">
-                  <h3 id="trendingTitle">
-                    <span class="material-symbols-outlined">trending_up</span>
-                    Trending Now
-                  </h3>
-                  <div class="section-actions">
-                    <button
-                      class="btn ghost refresh-btn"
-                      aria-label="Refresh trending anime"
-                    >
-                      <span class="material-symbols-outlined">refresh</span>
-                    </button>
-                  </div>
-                </header>
-                <div
-                  id="trendingGrid"
-                  class="grid small-grid"
-                  role="grid"
-                  aria-label="Trending anime grid"
-                >
-                  <div class="grid-loader" aria-hidden="true">
-                    <div class="skeleton-grid">
-                      <div class="skeleton-card">
-                        <div class="skeleton-image pulse"></div>
-                        <div class="skeleton-content">
-                          <div class="skeleton-title pulse"></div>
-                          <div class="skeleton-text pulse"></div>
-                        </div>
-                      </div>
-                      <div class="skeleton-card">
-                        <div class="skeleton-image pulse"></div>
-                        <div class="skeleton-content">
-                          <div class="skeleton-title pulse"></div>
-                          <div class="skeleton-text pulse"></div>
-                        </div>
-                      </div>
-                      <div class="skeleton-card">
-                        <div class="skeleton-image pulse"></div>
-                        <div class="skeleton-content">
-                          <div class="skeleton-title pulse"></div>
-                          <div class="skeleton-text pulse"></div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </section>
-
-              <!-- Popular -->
-              <section
-                class="discover-section panel"
-                aria-labelledby="popularTitle"
-              >
-                <header class="section-header">
-                  <h3 id="popularTitle">
-                    <span class="material-symbols-outlined">whatshot</span>
-                    Most Popular
-                  </h3>
-                  <div class="section-actions">
-                    <button
-                      class="btn ghost refresh-btn"
-                      aria-label="Refresh popular anime"
-                    >
-                      <span class="material-symbols-outlined">refresh</span>
-                    </button>
-                  </div>
-                </header>
-                <div
-                  id="popularGrid"
-                  class="grid small-grid"
-                  role="grid"
-                  aria-label="Popular anime grid"
-                >
-                  <div class="grid-loader" aria-hidden="true">
-                    <!-- Same skeleton structure as above -->
-                  </div>
-                </div>
-              </section>
-
-              <!-- New & Upcoming -->
-              <section
-                class="discover-section panel"
-                aria-labelledby="newTitle"
-              >
-                <header class="section-header">
-                  <h3 id="newTitle">
-                    <span class="material-symbols-outlined">new_releases</span>
-                    New & Upcoming
-                  </h3>
-                  <div class="section-actions">
-                    <button
-                      class="btn ghost refresh-btn"
-                      aria-label="Refresh new anime"
-                    >
-                      <span class="material-symbols-outlined">refresh</span>
-                    </button>
-                  </div>
-                </header>
-                <div
-                  id="newGrid"
-                  class="grid small-grid"
-                  role="grid"
-                  aria-label="New anime grid"
-                >
-                  <div class="grid-loader" aria-hidden="true">
-                    <!-- Same skeleton structure as above -->
-                  </div>
-                </div>
-              </section>
-
-              <!-- Top Rated -->
-              <section
-                class="discover-section panel"
-                aria-labelledby="topTitle"
-              >
-                <header class="section-header">
-                  <h3 id="topTitle">
-                    <span class="material-symbols-outlined">star</span>
-                    Top Rated
-                  </h3>
-                  <div class="section-actions">
-                    <button
-                      class="btn ghost refresh-btn"
-                      aria-label="Refresh top rated anime"
-                    >
-                      <span class="material-symbols-outlined">refresh</span>
-                    </button>
-                  </div>
-                </header>
-                <div
-                  id="topGrid"
-                  class="grid small-grid"
-                  role="grid"
-                  aria-label="Top rated anime grid"
-                >
-                  <div class="grid-loader" aria-hidden="true">
-                    <!-- Same skeleton structure as above -->
-                  </div>
-                </div>
-              </section>
-            </div>
-          </section>
-
-          <!-- Search tab -->
-          <section id="search" class="tab-panel">
-            <div class="panel">
-              <form id="searchForm" class="search-form">
-                <input
-                  id="searchQuery"
-                  placeholder="Search AniList for anime (title, synonyms)..."
-                />
-                <select id="searchLimit">
-                  <option>8</option>
-                  <option>12</option>
-                  <option>24</option>
-                </select>
-                <button class="btn primary">Search</button>
-              </form>
-            </div>
-            <div id="searchResults" class="grid"></div>
-          </section>
-
-          <!-- Settings removed -->
         </section>
       </main>
 
-      <!-- Add/Edit modal -->
-      <div
-        id="modal"
-        class="modal"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="modalTitle"
-        aria-hidden="true"
-      >
-        <div class="modal-overlay" tabindex="-1" data-dismiss="modal"></div>
-        <div class="sheet" role="document">
-          <header class="sheet-head">
-            <h3 id="modalTitle" class="sheet-title">Add Anime</h3>
-            <div class="sheet-actions">
+      <div id="toast" class="toast">Toast Message</div>
+
+      <dialog id="modal" class="m3-dialog">
+        <div class="dialog-header">
+          <h3 id="modalTitle">Add Anime</h3>
+          <button id="modalClose" class="m3-icon-btn">
+            <i class="mdi mdi-close"></i>
+          </button>
+        </div>
+        <form id="animeForm" data-id="" class="dialog-content">
+          <input type="hidden" name="id" />
+          <div class="form-row">
+            <label for="title" class="m3-label">Title</label>
+            <input
+              type="text"
+              id="title"
+              name="title"
+              required
+              class="m3-input"
+            />
+          </div>
+          <div class="form-row">
+            <label for="alt" class="m3-label">Alt/English Title</label>
+            <input type="text" id="alt" name="alt" class="m3-input" />
+          </div>
+          <div class="form-row split">
+            <div>
+              <label for="total" class="m3-label">Total Episodes</label>
+              <input
+                type="number"
+                id="total"
+                name="total"
+                min="0"
+                value="12"
+                class="m3-input small"
+              />
+            </div>
+            <div>
+              <label for="watched" class="m3-label">Episodes Watched</label>
+              <input
+                type="number"
+                id="watched"
+                name="watched"
+                min="0"
+                value="0"
+                class="m3-input small"
+              />
+            </div>
+          </div>
+          <div class="form-row split">
+            <div>
+              <label for="status" class="m3-label">Status</label>
+              <select id="status" name="status" class="m3-select">
+                <option value="watching">Watching</option>
+                <option value="completed">Completed</option>
+                <option value="plan">Plan to Watch</option>
+                <option value="dropped">Dropped</option>
+                <option value="paused">Paused</option>
+              </select>
+            </div>
+            <div>
+              <label for="rating" class="m3-label">Your Rating (1-10)</label>
+              <input
+                type="number"
+                id="rating"
+                name="rating"
+                min="1"
+                max="10"
+                class="m3-input small"
+              />
+            </div>
+          </div>
+          <div class="form-row">
+            <label for="image" class="m3-label">Cover Image URL</label>
+            <div class="input-with-button">
+              <input type="url" id="image" name="image" class="m3-input" />
               <button
-                id="modalClose"
-                class="icon-btn"
-                aria-label="Close dialog"
-                title="Close"
+                type="button"
+                id="autoCoverBtn"
+                class="m3-button secondary small"
               >
-                <span class="material-symbols-outlined">close</span>
+                <i class="mdi mdi-image-auto-adjust"></i> Auto-fill
               </button>
             </div>
-          </header>
-          <form id="animeForm" class="sheet-body" novalidate>
-            <div class="form-grid">
-              <div class="form-group">
-                <label for="animeTitle"
-                  >Title <span class="required">*</span></label
-                >
-                <input
-                  id="animeTitle"
-                  name="title"
-                  type="text"
-                  required
-                  autocomplete="off"
-                  placeholder="Enter anime title"
-                  aria-required="true"
-                />
-                <div class="form-hint">Main title of the anime series</div>
-              </div>
-
-              <div class="form-group">
-                <label for="animeAlt">Alternative Title</label>
-                <input
-                  id="animeAlt"
-                  name="alt"
-                  type="text"
-                  placeholder="Alternative/Japanese title"
-                />
-                <div class="form-hint">Also known as, or original title</div>
-              </div>
-
-              <div class="form-group">
-                <label for="animeCover">Cover Image URL</label>
-                <div class="input-group">
-                  <input
-                    id="animeCover"
-                    name="image"
-                    type="url"
-                    placeholder="https://"
-                    pattern="https?://.+"
-                  />
-                  <button
-                    type="button"
-                    id="autoCoverBtn"
-                    class="btn ghost"
-                    title="Auto-fill from AniList"
-                  >
-                    <span class="material-symbols-outlined">auto_fix</span>
-                  </button>
-                </div>
-                <div class="form-hint">
-                  Will be auto-fetched from AniList if left empty
-                </div>
-              </div>
-
-              <div class="form-row">
-                <div class="form-group">
-                  <label for="animeTotal"
-                    >Total Episodes <span class="required">*</span></label
-                  >
-                  <input
-                    id="animeTotal"
-                    name="total"
-                    type="number"
-                    min="1"
-                    max="2000"
-                    value="12"
-                    required
-                    aria-required="true"
-                  />
-                </div>
-
-                <div class="form-group">
-                  <label for="animeWatched">Episodes Watched</label>
-                  <input
-                    id="animeWatched"
-                    name="watched"
-                    type="number"
-                    min="0"
-                    value="0"
-                  />
-                </div>
-              </div>
-
-              <div class="form-group">
-                <label for="animeStatus"
-                  >Status <span class="required">*</span></label
-                >
-                <select
-                  id="animeStatus"
-                  name="status"
-                  required
-                  aria-required="true"
-                >
-                  <option value="watching">Currently Watching</option>
-                  <option value="completed">Completed</option>
-                  <option value="onhold">On Hold</option>
-                  <option value="dropped">Dropped</option>
-                  <option value="plan">Plan to Watch</option>
-                </select>
-              </div>
-
-              <div class="form-group">
-                <label for="animeRating">Your Rating</label>
-                <select id="animeRating" name="rating">
-                  <option value="">No Rating</option>
-                  <option value="10">10 - Masterpiece</option>
-                  <option value="9">9 - Excellent</option>
-                  <option value="8">8 - Very Good</option>
-                  <option value="7">7 - Good</option>
-                  <option value="6">6 - Fine</option>
-                  <option value="5">5 - Average</option>
-                  <option value="4">4 - Below Average</option>
-                  <option value="3">3 - Poor</option>
-                  <option value="2">2 - Very Poor</option>
-                  <option value="1">1 - Terrible</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="sheet-actions">
-              <div class="form-feedback" aria-live="polite"></div>
-              <div class="action-buttons">
-                <button type="submit" class="btn primary">
-                  <span class="material-symbols-outlined">save</span>
-                  <span>Save Changes</span>
-                </button>
-                <button type="button" id="cancelBtn" class="btn outline">
-                  <span>Cancel</span>
-                </button>
-              </div>
-            </div>
-          </form>
-        </div>
-      </div>
-
-      <input
-        id="importFile"
-        type="file"
-        accept="application/json"
-        style="display: none"
-      />
-      <div id="toast" class="toast" aria-live="polite"></div>
+          </div>
+          <div class="dialog-footer">
+            <button type="button" id="cancelBtn" class="m3-button secondary">
+              Cancel
+            </button>
+            <button type="submit" class="m3-button primary">Save Anime</button>
+          </div>
+        </form>
+      </dialog>
     </div>
 
-    <!-- Main script -->
-    <script src="script.js" defer></script>
+    <script src="script.js"></script>
   </body>
 </html>
