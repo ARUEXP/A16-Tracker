@@ -1,5 +1,5 @@
 /* =======================================
-    Android 16 Material Expressive CSS - MAX POLISH
+    Android 16 Material Expressive CSS - MAX POLISH & RESPONSIVE
 ========================================= */
 
 /* --- Tonal Palette & Expressive Variables --- */
@@ -18,7 +18,7 @@
 
   /* Expressive Accents */
   --color-secondary: #00bcd4;
-  --color-outline: #5c5a63; /* Slightly darker outline for better contrast */
+  --color-outline: #5c5a63;
 
   /* Expressive Shadows/Depths */
   --shadow-depth1: 0 1px 3px rgba(0, 0, 0, 0.5), 0 1px 2px rgba(0, 0, 0, 0.9);
@@ -28,7 +28,7 @@
   /* Shape & Typography */
   --radius-small: 8px;
   --radius-medium: 16px;
-  --radius-large: 24px; /* Slightly smaller for cleaner polish */
+  --radius-large: 24px;
 
   /* FONT UPDATE */
   --font-primary: "Montserrat", sans-serif;
@@ -38,7 +38,6 @@
 /* --- Base & Polish --- */
 * {
   box-sizing: border-box;
-  /* Use a more subtle transition duration */
   transition: background-color 0.2s, color 0.2s, box-shadow 0.2s, transform 0.1s;
 }
 
@@ -55,18 +54,15 @@ body {
 #app {
   max-width: 1400px;
   margin: 0 auto;
-  /* Reduced padding for less wasted space */
   padding: 0.5rem 1rem;
 }
 
 header {
   display: flex;
-  /* Switch to row layout on desktop for a compact bar */
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  /* Reduced padding */
-  padding: 0.5rem 0;
+  padding: 0.5rem 1rem;
   gap: 1.5rem;
   position: sticky;
   top: 0;
@@ -81,7 +77,7 @@ header {
 }
 
 .expressive-title {
-  font-size: 1.8rem; /* Reduced font size */
+  font-size: 1.8rem;
   padding: 0;
   margin: 0;
   text-shadow: var(--shadow-depth1);
@@ -91,64 +87,146 @@ header {
 nav {
   display: flex;
   background-color: var(--color-surface-bright);
-  border-radius: 999px; /* Perfect pill shape */
-  padding: 0.35rem; /* Reduced padding */
+  border-radius: 999px;
+  padding: 0.35rem;
   box-shadow: var(--shadow-depth2);
 }
 .tab {
-  padding: 0.6rem 1.25rem; /* Polished padding */
-  font-size: 0.9rem;
+  background: transparent;
+  border: none;
+  color: var(--color-on-surface-variant);
+  padding: 0.6rem 1.25rem;
+  border-radius: 999px;
+  cursor: pointer;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-primary);
+  text-transform: capitalize;
+}
+.tab:hover {
+  background-color: rgba(138, 124, 255, 0.1);
 }
 .tab.active {
-  transform: none; /* Removed scale for cleaner transitions */
-}
-
-/* --- Main Content & Spacing --- */
-main {
-  padding-top: 2rem;
-  padding-bottom: 4rem; /* Extra space for FAB clearance */
-}
-
-/* Controls/Filter Bar Polish */
-.controls-area {
-  gap: 0.75rem; /* Proper spacing */
-  margin-bottom: 2rem;
-  padding: 1rem;
-  border-radius: var(--radius-medium);
-}
-.filter-group {
-  gap: 0.75rem;
-}
-.m3-input,
-.m3-select {
-  padding: 0.6rem 0.75rem; /* Polished input height */
-  border-width: 1px; /* Subtle border */
+  background-color: var(--color-primary);
+  color: var(--color-on-primary);
   box-shadow: var(--shadow-depth1) inset;
 }
 
-/* --- Tracker Grid & Stats Layout --- */
+/* --- Controls/Filter Bar Layout FIX --- */
+.controls-area {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background-color: var(--color-surface-bright);
+  border-radius: var(--radius-medium);
+  box-shadow: var(--shadow-depth2);
+}
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* --- M3 Component Styling (Inputs, Selects, Checkboxes) --- */
+.m3-input,
+.m3-select {
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--color-outline);
+  border-radius: var(--radius-small);
+  background-color: var(--color-surface);
+  color: var(--color-on-surface);
+  font-size: 0.95rem;
+  box-shadow: var(--shadow-depth1) inset;
+  font-family: var(--font-primary);
+}
+.m3-input:focus,
+.m3-select:focus {
+  border-color: var(--color-primary);
+  outline: none;
+  box-shadow: 0 0 0 2px var(--color-primary), var(--shadow-depth1) inset;
+}
+.m3-input.large {
+  flex-grow: 1;
+}
+.m3-input.small {
+  width: 120px;
+}
+.m3-select.small {
+  max-width: 150px;
+}
+
+/* Checkbox Polish */
+.m3-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: var(--color-on-surface-variant);
+}
+.m3-checkbox-custom {
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--color-outline);
+  border-radius: 4px;
+  background-color: var(--color-surface);
+  position: relative;
+  display: inline-block;
+  flex-shrink: 0;
+}
+.m3-checkbox-label input[type="checkbox"] {
+  display: none;
+}
+.m3-checkbox-label input[type="checkbox"]:checked + .m3-checkbox-custom {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+.m3-checkbox-label input[type="checkbox"]:checked + .m3-checkbox-custom::after {
+  content: "\e5ca";
+  font-family: "Material Design Icons";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 14px;
+  color: var(--color-on-primary);
+  line-height: 1;
+}
+
+/* --- Card & Grid Layout --- */
 .tracker-container {
-  grid-template-columns: 4fr 1fr; /* Shift ratio for more card space */
+  display: grid;
+  grid-template-columns: 4fr 1fr;
   gap: 2rem;
 }
 
 .card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 1.5rem;
 }
 
-/* --- Anime Card Polish --- */
 .card {
   border-radius: var(--radius-large) var(--radius-small) var(--radius-medium)
-    var(--radius-large); /* Expressive Shape */
+    var(--radius-large);
   box-shadow: var(--shadow-depth2);
   min-height: 380px;
-  /* Subtle background elevation */
   background-color: var(--color-surface-bright);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  border: 2px solid transparent;
 }
-
 .card:hover {
   box-shadow: var(--shadow-depth3);
-  transform: translateY(-3px); /* Subtle lift */
+  transform: translateY(-3px);
   border-color: var(--color-primary);
 }
 
@@ -157,72 +235,84 @@ main {
   position: relative;
   overflow: hidden;
   background-color: var(--card-color, #1a1a1a);
-  border-radius: var(--radius-large) var(--radius-small) 0 0; /* Clean top corners */
+  border-radius: var(--radius-large) var(--radius-small) 0 0;
 }
 
-/* FIX: Image Polish - Remove Color Overlays */
+/* FIX: Image Polish - Full Vibrancy */
 .card .poster img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
-  mix-blend-mode: normal; /* **REMOVED COLOR BLEND** */
-  opacity: 1; /* **FULL VIBRANCY** */
+  mix-blend-mode: normal;
+  opacity: 1;
+}
+.card .poster img[src=""],
+.card .poster img:not([src]) {
+  display: none;
 }
 
 .card .meta {
   padding: 1rem;
-  gap: 0.5rem; /* Better spacing inside meta */
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-secondary);
+  gap: 0.5rem;
 }
-
 .card .title {
-  font-size: 1rem; /* Slightly smaller for cleaner look */
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-primary-container);
+  white-space: normal;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
   -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
   margin-bottom: 0;
 }
 .card .sub {
   font-size: 0.75rem;
+  color: var(--color-on-surface-variant);
   margin-bottom: 0.75rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pbar-text {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: var(--color-secondary);
+}
+.pbar {
+  height: 8px;
+  background-color: var(--color-surface);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: 4px;
+}
+.pbar i {
+  display: block;
+  height: 100%;
+  background-color: var(--color-primary);
+  border-radius: 4px;
 }
 
-/* Discover Card Overlay Polish */
-.card-overlay {
-  padding: 0.5rem 0.75rem;
-  font-family: var(--font-primary);
-}
-
-/* --- FAB Polish --- */
-.m3-fab.extended.primary {
-  /* More expressive, rounded corners */
-  border-radius: 999px;
-  padding: 0.8rem 1.5rem;
-  bottom: 1.5rem;
-  right: 1.5rem;
-  box-shadow: var(--shadow-depth3);
-}
-
-/* --- Dialog Polish --- */
-.m3-dialog {
-  border-radius: var(--radius-large);
-  box-shadow: var(--shadow-depth3);
-}
-.m3-dialog::backdrop {
-  backdrop-filter: blur(10px); /* Increased blur for depth */
-}
-
-/* --- Responsive Layout (Crucial for Polish) --- */
-
-/* Tablet & Smaller Desktop */
-@media (max-width: 1200px) {
+/* --- Responsive Layout FIXES --- */
+@media (max-width: 1000px) {
   .tracker-container {
-    grid-template-columns: 3fr 1fr;
+    grid-template-columns: 1fr;
     gap: 1.5rem;
+  }
+  .m3-fab.extended {
+    width: auto;
+    padding: 0.75rem 1.5rem;
   }
 }
 
-/* Mobile (Less than 768px) */
 @media (max-width: 768px) {
-  /* Header Stack/Min-Height Fix */
   header {
     flex-direction: column;
     align-items: stretch;
@@ -235,7 +325,6 @@ main {
     font-size: 2rem;
   }
 
-  /* Center the Navigation Tabs */
   nav {
     justify-content: center;
     padding: 0.25rem;
@@ -246,21 +335,16 @@ main {
     font-size: 0.85rem;
   }
 
-  /* Stack Main Content */
-  .tracker-container {
-    grid-template-columns: 1fr; /* Stack tracker and stats */
-    gap: 1rem;
-  }
-
-  /* Controls/Filter Bar */
   .controls-area {
     flex-direction: column;
     align-items: stretch;
     padding: 0.75rem;
+    gap: 0.5rem;
   }
   .filter-group {
     flex-wrap: wrap;
     justify-content: space-between;
+    width: 100%;
   }
   .m3-input,
   .m3-select {
@@ -268,34 +352,20 @@ main {
   }
   .m3-input.small,
   .m3-select.small {
-    width: auto;
+    width: calc(50% - 4px);
     max-width: none;
     flex-grow: 1;
   }
 
-  /* Card Grid */
   .card-grid {
-    grid-template-columns: repeat(
-      auto-fill,
-      minmax(150px, 1fr)
-    ); /* Smaller cards on mobile */
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     gap: 1rem;
   }
   .card .poster {
-    height: 220px; /* Reduced height for better fit */
+    height: 220px;
   }
-  .card {
-    min-height: 300px;
-  }
-
-  /* FAB Adjustment */
-  .m3-fab.extended {
-    padding: 0.75rem 1.25rem;
-    font-size: 1rem;
-  }
-
-  /* Settings Grid */
-  .settings-grid {
-    grid-template-columns: 1fr;
+  .m3-dialog {
+    max-width: 95vw;
+    margin: 1rem;
   }
 }

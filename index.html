@@ -21,16 +21,36 @@
           <span class="bungee-font">A16</span> Anime Tracker
         </h1>
         <nav>
-          <button class="tab active" data-tab="tracker" aria-selected="true">
+          <button
+            class="tab active"
+            data-tab="tracker"
+            id="trackerTab"
+            aria-selected="true"
+          >
             <i class="mdi mdi-animation-play"></i> Tracker
           </button>
-          <button class="tab" data-tab="discover" aria-selected="false">
+          <button
+            class="tab"
+            data-tab="discover"
+            id="discoverTab"
+            aria-selected="false"
+          >
             <i class="mdi mdi-compass-outline"></i> Discover
           </button>
-          <button class="tab" data-tab="search" aria-selected="false">
+          <button
+            class="tab"
+            data-tab="search"
+            id="searchTab"
+            aria-selected="false"
+          >
             <i class="mdi mdi-magnify"></i> Search
           </button>
-          <button class="tab" data-tab="settings" aria-selected="false">
+          <button
+            class="tab"
+            data-tab="settings"
+            id="settingsTab"
+            aria-selected="false"
+          >
             <i class="mdi mdi-tune-vertical"></i> Settings
           </button>
         </nav>
@@ -52,7 +72,7 @@
             </div>
 
             <div class="filter-group">
-              <select id="statusFilter" class="m3-select">
+              <select id="statusFilter" class="m3-select small">
                 <option value="all">Status: All</option>
                 <option value="watching">Watching</option>
                 <option value="completed">Completed</option>
@@ -60,7 +80,7 @@
                 <option value="dropped">Dropped</option>
                 <option value="paused">Paused</option>
               </select>
-              <select id="sortBy" class="m3-select">
+              <select id="sortBy" class="m3-select small">
                 <option value="created">Sort By: Added</option>
                 <option value="alpha">Sort By: Title</option>
                 <option value="progress">Sort By: Progress</option>
@@ -120,7 +140,7 @@
         <section id="discover" class="tab-panel">
           <div class="controls-area discover-controls">
             <div class="filter-group">
-              <select id="seasonFilter" class="m3-select">
+              <select id="seasonFilter" class="m3-select small">
                 <option value="all">Season: All</option>
                 <option value="WINTER">Winter</option>
                 <option value="SPRING">Spring</option>
@@ -136,7 +156,7 @@
                 max="2050"
                 class="m3-input small"
               />
-              <select id="genreFilter" class="m3-select">
+              <select id="genreFilter" class="m3-select small">
                 <option value="all">Genre: All</option>
                 <option value="Action">Action</option>
                 <option value="Adventure">Adventure</option>
@@ -188,7 +208,7 @@
                 required
                 class="m3-input large"
               />
-              <select id="searchSeason" class="m3-select">
+              <select id="searchSeason" class="m3-select small">
                 <option value="all">Season: All</option>
                 <option value="WINTER">Winter</option>
                 <option value="SPRING">Spring</option>
@@ -204,7 +224,7 @@
                 max="2050"
                 class="m3-input small"
               />
-              <select id="searchGenre" class="m3-select">
+              <select id="searchGenre" class="m3-select small">
                 <option value="all">Genre: All</option>
                 <option value="Action">Action</option>
                 <option value="Adventure">Adventure</option>
