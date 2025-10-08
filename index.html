@@ -32,41 +32,78 @@
   <body>
     <div id="app" class="app">
       <header class="topbar">
-        <div class="brand">
-          <div class="logo">A16</div>
+        <div class="brand" role="banner">
+          <a href="." class="logo-link" aria-label="A16 Anime Tracker Homepage">
+            <div class="logo">A16</div>
+          </a>
           <div class="brand-text">
-            <h1>A16 <span>Anime</span></h1>
+            <h1>A16 <span class="accent">Anime</span></h1>
             <p class="muted">Track • Discover • Local</p>
           </div>
         </div>
 
-        <nav class="tabs" role="tablist" aria-label="Main tabs">
-          <button class="tab active" data-tab="tracker">Tracker</button>
-          <button class="tab" data-tab="discover">Discover</button>
-          <button class="tab" data-tab="search">Search</button>
-          <!-- settings tab removed -->
+        <nav class="tabs" role="tablist" aria-label="Main navigation">
+          <button
+            class="tab active"
+            role="tab"
+            aria-selected="true"
+            aria-controls="tracker"
+            data-tab="tracker"
+          >
+            <span class="material-symbols-outlined">format_list_bulleted</span>
+            <span>Tracker</span>
+          </button>
+          <button
+            class="tab"
+            role="tab"
+            aria-selected="false"
+            aria-controls="discover"
+            data-tab="discover"
+          >
+            <span class="material-symbols-outlined">explore</span>
+            <span>Discover</span>
+          </button>
+          <button
+            class="tab"
+            role="tab"
+            aria-selected="false"
+            aria-controls="search"
+            data-tab="search"
+          >
+            <span class="material-symbols-outlined">search</span>
+            <span>Search</span>
+          </button>
         </nav>
 
         <div class="top-actions">
-          <div class="search-quick">
-            <input
-              id="quickSearch"
-              type="search"
-              placeholder="Quick search (local)"
-              aria-label="Quick search"
-            />
-            <button
-              id="clearQuick"
-              title="Clear quick search"
-              aria-label="Clear quick search"
-            >
-              <span class="material-symbols-outlined">close</span>
+          <div class="search-quick" role="search">
+            <label class="sr-only" for="quickSearch">Quick search</label>
+            <div class="search-input-wrapper">
+              <span class="material-symbols-outlined search-icon">search</span>
+              <input
+                id="quickSearch"
+                type="search"
+                placeholder="Quick search your list..."
+                aria-label="Quick search"
+                autocomplete="off"
+              />
+              <button
+                id="clearQuick"
+                class="clear-btn"
+                type="button"
+                title="Clear search"
+                aria-label="Clear search"
+              >
+                <span class="material-symbols-outlined">close</span>
+              </button>
+            </div>
+          </div>
+          <div class="action-buttons">
+            <button id="addBtn" class="btn primary">
+              <span class="material-symbols-outlined">add</span>
+              <span>Add Anime</span>
             </button>
           </div>
-          <button id="themeToggle" class="icon-btn" title="Toggle theme">
-            <span class="material-symbols-outlined">dark_mode</span>
-          </button>
-          <button id="addBtn" class="btn primary">+ Add</button>
         </div>
       </header>
 
@@ -136,20 +173,73 @@
               </div>
             </div>
 
-            <div id="trackerGrid" class="grid"></div>
-            <div id="trackerEmpty" class="empty panel">
-              <img
-                src="https://images.unsplash.com/photo-1541562232579-512a21360020?auto=format&fit=crop&w=1200&q=80"
-                alt="empty"
-              />
-              <div>
-                <h3>No anime yet</h3>
-                <p class="muted">
-                  Add or import to get started. Use Discover for
-                  recommendations.
-                </p>
-                <div style="margin-top: 10px">
-                  <button id="openAdd1" class="btn primary">Add Anime</button>
+            <div class="grid-container">
+              <div
+                id="trackerGrid"
+                class="grid"
+                role="grid"
+                aria-label="Anime list"
+              >
+                <!-- Grid items will be dynamically inserted here -->
+                <div class="grid-loader">
+                  <div class="skeleton-grid">
+                    <div class="skeleton-card" aria-hidden="true">
+                      <div class="skeleton-image"></div>
+                      <div class="skeleton-content">
+                        <div class="skeleton-title"></div>
+                        <div class="skeleton-text"></div>
+                        <div class="skeleton-text short"></div>
+                      </div>
+                    </div>
+                    <!-- Repeat skeleton cards for loading state -->
+                    <div class="skeleton-card" aria-hidden="true">
+                      <div class="skeleton-image"></div>
+                      <div class="skeleton-content">
+                        <div class="skeleton-title"></div>
+                        <div class="skeleton-text"></div>
+                        <div class="skeleton-text short"></div>
+                      </div>
+                    </div>
+                    <div class="skeleton-card" aria-hidden="true">
+                      <div class="skeleton-image"></div>
+                      <div class="skeleton-content">
+                        <div class="skeleton-title"></div>
+                        <div class="skeleton-text"></div>
+                        <div class="skeleton-text short"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                id="trackerEmpty"
+                class="empty panel"
+                role="status"
+                aria-live="polite"
+              >
+                <img
+                  src="https://images.unsplash.com/photo-1541562232579-512a21360020?auto=format&fit=crop&w=1200&q=80"
+                  alt="Decorative empty state illustration"
+                  loading="lazy"
+                />
+                <div class="empty-content">
+                  <h3>Start Your Anime Collection</h3>
+                  <p class="muted">
+                    Ready to track your favorite anime? Add titles manually or
+                    import your list. Check out our Discover section for
+                    recommendations!
+                  </p>
+                  <div class="empty-actions">
+                    <button id="openAdd1" class="btn primary">
+                      <span class="material-symbols-outlined">add</span>
+                      <span>Add Your First Anime</span>
+                    </button>
+                    <button id="openDiscover" class="btn ghost">
+                      <span class="material-symbols-outlined">explore</span>
+                      <span>Browse Recommendations</span>
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -177,36 +267,150 @@
 
             <div id="discoverSections" class="discover-sections">
               <!-- Trending -->
-              <div class="section panel">
-                <h3>Trending</h3>
-                <div id="trendingGrid" class="grid small-grid">
-                  <div class="loader">Loading...</div>
+              <section
+                class="discover-section panel"
+                aria-labelledby="trendingTitle"
+              >
+                <header class="section-header">
+                  <h3 id="trendingTitle">
+                    <span class="material-symbols-outlined">trending_up</span>
+                    Trending Now
+                  </h3>
+                  <div class="section-actions">
+                    <button
+                      class="btn ghost refresh-btn"
+                      aria-label="Refresh trending anime"
+                    >
+                      <span class="material-symbols-outlined">refresh</span>
+                    </button>
+                  </div>
+                </header>
+                <div
+                  id="trendingGrid"
+                  class="grid small-grid"
+                  role="grid"
+                  aria-label="Trending anime grid"
+                >
+                  <div class="grid-loader" aria-hidden="true">
+                    <div class="skeleton-grid">
+                      <div class="skeleton-card">
+                        <div class="skeleton-image pulse"></div>
+                        <div class="skeleton-content">
+                          <div class="skeleton-title pulse"></div>
+                          <div class="skeleton-text pulse"></div>
+                        </div>
+                      </div>
+                      <div class="skeleton-card">
+                        <div class="skeleton-image pulse"></div>
+                        <div class="skeleton-content">
+                          <div class="skeleton-title pulse"></div>
+                          <div class="skeleton-text pulse"></div>
+                        </div>
+                      </div>
+                      <div class="skeleton-card">
+                        <div class="skeleton-image pulse"></div>
+                        <div class="skeleton-content">
+                          <div class="skeleton-title pulse"></div>
+                          <div class="skeleton-text pulse"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </div>
+              </section>
 
               <!-- Popular -->
-              <div class="section panel">
-                <h3>Popular</h3>
-                <div id="popularGrid" class="grid small-grid">
-                  <div class="loader">Loading...</div>
+              <section
+                class="discover-section panel"
+                aria-labelledby="popularTitle"
+              >
+                <header class="section-header">
+                  <h3 id="popularTitle">
+                    <span class="material-symbols-outlined">whatshot</span>
+                    Most Popular
+                  </h3>
+                  <div class="section-actions">
+                    <button
+                      class="btn ghost refresh-btn"
+                      aria-label="Refresh popular anime"
+                    >
+                      <span class="material-symbols-outlined">refresh</span>
+                    </button>
+                  </div>
+                </header>
+                <div
+                  id="popularGrid"
+                  class="grid small-grid"
+                  role="grid"
+                  aria-label="Popular anime grid"
+                >
+                  <div class="grid-loader" aria-hidden="true">
+                    <!-- Same skeleton structure as above -->
+                  </div>
                 </div>
-              </div>
+              </section>
 
-              <!-- New / Upcoming -->
-              <div class="section panel">
-                <h3>New & Upcoming</h3>
-                <div id="newGrid" class="grid small-grid">
-                  <div class="loader">Loading...</div>
+              <!-- New & Upcoming -->
+              <section
+                class="discover-section panel"
+                aria-labelledby="newTitle"
+              >
+                <header class="section-header">
+                  <h3 id="newTitle">
+                    <span class="material-symbols-outlined">new_releases</span>
+                    New & Upcoming
+                  </h3>
+                  <div class="section-actions">
+                    <button
+                      class="btn ghost refresh-btn"
+                      aria-label="Refresh new anime"
+                    >
+                      <span class="material-symbols-outlined">refresh</span>
+                    </button>
+                  </div>
+                </header>
+                <div
+                  id="newGrid"
+                  class="grid small-grid"
+                  role="grid"
+                  aria-label="New anime grid"
+                >
+                  <div class="grid-loader" aria-hidden="true">
+                    <!-- Same skeleton structure as above -->
+                  </div>
                 </div>
-              </div>
+              </section>
 
               <!-- Top Rated -->
-              <div class="section panel">
-                <h3>Top Rated</h3>
-                <div id="topGrid" class="grid small-grid">
-                  <div class="loader">Loading...</div>
+              <section
+                class="discover-section panel"
+                aria-labelledby="topTitle"
+              >
+                <header class="section-header">
+                  <h3 id="topTitle">
+                    <span class="material-symbols-outlined">star</span>
+                    Top Rated
+                  </h3>
+                  <div class="section-actions">
+                    <button
+                      class="btn ghost refresh-btn"
+                      aria-label="Refresh top rated anime"
+                    >
+                      <span class="material-symbols-outlined">refresh</span>
+                    </button>
+                  </div>
+                </header>
+                <div
+                  id="topGrid"
+                  class="grid small-grid"
+                  role="grid"
+                  aria-label="Top rated anime grid"
+                >
+                  <div class="grid-loader" aria-hidden="true">
+                    <!-- Same skeleton structure as above -->
+                  </div>
                 </div>
-              </div>
+              </section>
             </div>
           </section>
 
@@ -234,70 +438,158 @@
       </main>
 
       <!-- Add/Edit modal -->
-      <div id="modal" class="modal" aria-hidden="true">
-        <div class="sheet">
+      <div
+        id="modal"
+        class="modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modalTitle"
+        aria-hidden="true"
+      >
+        <div class="modal-overlay" tabindex="-1" data-dismiss="modal"></div>
+        <div class="sheet" role="document">
           <header class="sheet-head">
-            <h3 id="modalTitle">Add Anime</h3>
-            <div>
-              <button id="modalClose" class="icon-btn" aria-label="Close modal">
+            <h3 id="modalTitle" class="sheet-title">Add Anime</h3>
+            <div class="sheet-actions">
+              <button
+                id="modalClose"
+                class="icon-btn"
+                aria-label="Close dialog"
+                title="Close"
+              >
                 <span class="material-symbols-outlined">close</span>
               </button>
             </div>
           </header>
-          <form id="animeForm" class="sheet-body">
+          <form id="animeForm" class="sheet-body" novalidate>
             <div class="form-grid">
-              <label>Title <input name="title" required /></label>
-              <label>Alt Title <input name="alt" /></label>
-              <label
-                >Cover URL
+              <div class="form-group">
+                <label for="animeTitle"
+                  >Title <span class="required">*</span></label
+                >
                 <input
-                  name="image"
-                  placeholder="Optional - auto fetched from AniList if blank"
-              /></label>
-              <label
-                >Total Episodes
-                <input name="total" type="number" min="1" value="12"
-              /></label>
-              <label
-                >Episodes Watched
-                <input name="watched" type="number" min="0" value="0"
-              /></label>
-              <label
-                >Status
-                <select name="status">
-                  <option value="watching">Watching</option>
+                  id="animeTitle"
+                  name="title"
+                  type="text"
+                  required
+                  autocomplete="off"
+                  placeholder="Enter anime title"
+                  aria-required="true"
+                />
+                <div class="form-hint">Main title of the anime series</div>
+              </div>
+
+              <div class="form-group">
+                <label for="animeAlt">Alternative Title</label>
+                <input
+                  id="animeAlt"
+                  name="alt"
+                  type="text"
+                  placeholder="Alternative/Japanese title"
+                />
+                <div class="form-hint">Also known as, or original title</div>
+              </div>
+
+              <div class="form-group">
+                <label for="animeCover">Cover Image URL</label>
+                <div class="input-group">
+                  <input
+                    id="animeCover"
+                    name="image"
+                    type="url"
+                    placeholder="https://"
+                    pattern="https?://.+"
+                  />
+                  <button
+                    type="button"
+                    id="autoCoverBtn"
+                    class="btn ghost"
+                    title="Auto-fill from AniList"
+                  >
+                    <span class="material-symbols-outlined">auto_fix</span>
+                  </button>
+                </div>
+                <div class="form-hint">
+                  Will be auto-fetched from AniList if left empty
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="animeTotal"
+                    >Total Episodes <span class="required">*</span></label
+                  >
+                  <input
+                    id="animeTotal"
+                    name="total"
+                    type="number"
+                    min="1"
+                    max="2000"
+                    value="12"
+                    required
+                    aria-required="true"
+                  />
+                </div>
+
+                <div class="form-group">
+                  <label for="animeWatched">Episodes Watched</label>
+                  <input
+                    id="animeWatched"
+                    name="watched"
+                    type="number"
+                    min="0"
+                    value="0"
+                  />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="animeStatus"
+                  >Status <span class="required">*</span></label
+                >
+                <select
+                  id="animeStatus"
+                  name="status"
+                  required
+                  aria-required="true"
+                >
+                  <option value="watching">Currently Watching</option>
                   <option value="completed">Completed</option>
                   <option value="onhold">On Hold</option>
                   <option value="dropped">Dropped</option>
                   <option value="plan">Plan to Watch</option>
                 </select>
-              </label>
-              <label
-                >Rating
-                <select name="rating">
-                  <option value="">—</option>
-                  <option>10</option>
-                  <option>9</option>
-                  <option>8</option>
-                  <option>7</option>
-                  <option>6</option>
-                  <option>5</option>
-                  <option>4</option>
-                  <option>3</option>
-                  <option>2</option>
-                  <option>1</option>
+              </div>
+
+              <div class="form-group">
+                <label for="animeRating">Your Rating</label>
+                <select id="animeRating" name="rating">
+                  <option value="">No Rating</option>
+                  <option value="10">10 - Masterpiece</option>
+                  <option value="9">9 - Excellent</option>
+                  <option value="8">8 - Very Good</option>
+                  <option value="7">7 - Good</option>
+                  <option value="6">6 - Fine</option>
+                  <option value="5">5 - Average</option>
+                  <option value="4">4 - Below Average</option>
+                  <option value="3">3 - Poor</option>
+                  <option value="2">2 - Very Poor</option>
+                  <option value="1">1 - Terrible</option>
                 </select>
-              </label>
+              </div>
             </div>
 
             <div class="sheet-actions">
-              <button type="submit" class="btn primary">Save</button>
-              <button type="button" id="autoCoverBtn" class="btn ghost">
-                Auto Cover (AniList)
-              </button>
-              <button type="button" id="cancelBtn" class="btn outline">
-                Cancel
-              </button>
+              <div class="form-feedback" aria-live="polite"></div>
+              <div class="action-buttons">
+                <button type="submit" class="btn primary">
+                  <span class="material-symbols-outlined">save</span>
+                  <span>Save Changes</span>
+                </button>
+                <button type="button" id="cancelBtn" class="btn outline">
+                  <span>Cancel</span>
+                </button>
+              </div>
             </div>
           </form>
         </div>

@@ -1,0 +1,981 @@
+:root {
+  /* Colors */
+  --bg: #071026;
+  --card: #0e1626;
+  --muted: rgba(255, 255, 255, 0.78);
+  --accent: #06b6d4;
+  --accent2: #9b6bff;
+  --glass: rgba(255, 255, 255, 0.03);
+  --glass-stronger: rgba(255, 255, 255, 0.06);
+  --surface: rgba(255, 255, 255, 0.04);
+
+  /* Typography */
+  --title-font: "Montserrat", sans-serif;
+  --body-font: "Poppins", sans-serif;
+  --font-xs: 0.75rem; /* 12px */
+  --font-sm: 0.875rem; /* 14px */
+  --font-base: 1rem; /* 16px */
+  --font-lg: 1.125rem; /* 18px */
+  --font-xl: 1.25rem; /* 20px */
+  --font-2xl: 1.5rem; /* 24px */
+
+  /* Layout */
+  --maxw: 1200px;
+  --gap: 16px;
+  --radius-sm: 8px;
+  --radius: 12px;
+  --radius-lg: 16px;
+  --header-height: 70px;
+
+  /* Elevation/Shadows */
+  --elev1: 0 1px 2px rgba(0, 0, 0, 0.3), 0 10px 30px -4px rgba(3, 8, 20, 0.6);
+  --elev2: 0 2px 4px rgba(0, 0, 0, 0.3), 0 18px 48px -8px rgba(3, 8, 20, 0.7);
+  --elev3: 0 4px 6px rgba(0, 0, 0, 0.3), 0 24px 60px -12px rgba(3, 8, 20, 0.8);
+
+  /* Transitions */
+  --trans-fast: 120ms cubic-bezier(0.4, 0, 0.2, 1);
+  --trans-med: 180ms cubic-bezier(0.4, 0, 0.2, 1);
+  --trans-slow: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Removed light theme to keep a single dark theme for simplicity and UX consistency */
+
+* {
+  box-sizing: border-box;
+}
+
+/* Use Poppins everywhere by default; headings override with Montserrat */
+html,
+body,
+* {
+  font-family: var(--body-font);
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--body-font);
+  background: var(--bg);
+  color: #eaf6fb;
+  padding: 12px;
+  /* slightly reduced padding for small screens */
+  display: flex;
+  justify-content: center;
+}
+
+/* Force heading font */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--title-font);
+}
+
+.app {
+  width: 100%;
+  max-width: var(--maxw);
+}
+
+/* topbar */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gap);
+  height: var(--header-height);
+  padding: 0.75rem 1rem;
+  background: linear-gradient(
+    to bottom,
+    rgba(7, 16, 38, 0.95),
+    rgba(7, 16, 38, 0.9)
+  );
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--surface);
+  margin: -12px -12px 0;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.25rem;
+  transition: transform var(--trans-med);
+}
+
+.brand:hover {
+  transform: translateY(-1px);
+}
+
+.logo {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius);
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  font-size: var(--font-xl);
+  letter-spacing: -0.5px;
+  box-shadow: var(--elev1);
+  transition: transform var(--trans-med), box-shadow var(--trans-med);
+}
+
+.brand:hover .logo {
+  transform: scale(1.05);
+  box-shadow: var(--elev2);
+}
+
+.brand-text h1 {
+  font-family: var(--title-font);
+  margin: 0;
+  font-size: var(--font-xl);
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  background: linear-gradient(90deg, #fff, rgba(255, 255, 255, 0.9));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.brand-text span {
+  color: var(--accent2);
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* small accent helper */
+.accent-text {
+  color: var(--accent);
+}
+
+.muted {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+/* tabs */
+.tabs {
+  display: flex;
+  gap: 8px;
+}
+
+/* tab panels: hide inactive panels */
+.tab-panel {
+  display: none;
+}
+
+.tab-panel.active {
+  display: block;
+}
+
+.tab {
+  background: transparent;
+  border: 0;
+  padding: 10px 14px;
+  border-radius: 10px;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.tab.active {
+  background: var(--glass);
+  color: white;
+  box-shadow: var(--elev1);
+}
+
+/* make topbar responsive: allow wrapping and stacking on narrow screens */
+.topbar {
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.brand {
+  flex: 0 1 auto;
+}
+
+.tabs {
+  flex: 1 1 auto;
+  display: flex;
+  justify-content: center;
+}
+
+.top-actions {
+  flex: 0 1 auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* top actions */
+.top-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.search-quick {
+  display: flex;
+  align-items: center;
+  background: var(--glass);
+  padding: 6px;
+  border-radius: 10px;
+}
+
+.search-quick input {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  padding: 6px 10px;
+  outline: 0;
+}
+
+/* Form controls - unified appearance */
+input[type="text"],
+input[type="search"],
+input[type="number"],
+input[type="color"],
+select,
+textarea {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  padding: 8px 10px;
+  border-radius: 8px;
+  color: inherit;
+  outline: none;
+  transition: box-shadow 0.12s, border-color 0.12s, transform 0.08s;
+  font-family: var(--body-font);
+}
+
+/* slightly stronger contrast on inputs for readability */
+input[type="text"],
+input[type="search"],
+select {
+  background: rgba(255, 255, 255, 0.01);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: rgba(255, 255, 255, 0.45);
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: rgba(255, 255, 255, 0.14);
+  box-shadow: 0 4px 18px rgba(2, 6, 12, 0.45), 0 0 0 4px rgba(6, 182, 212, 0.06);
+}
+
+select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  padding-right: 32px;
+  background-image: linear-gradient(
+      45deg,
+      transparent 50%,
+      rgba(255, 255, 255, 0.6) 50%
+    ),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.6) 50%, transparent 50%);
+  background-position: calc(100% - 14px) calc(1em + 2px),
+    calc(100% - 10px) calc(1em + 2px);
+  background-size: 6px 6px, 6px 6px;
+  background-repeat: no-repeat;
+}
+
+/* make selects and inputs more compact on small screens */
+.panel select,
+.form-grid select {
+  padding: 6px 8px;
+}
+
+/* Remove spinner arrows on number inputs for cleaner look */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* small input inside header */
+.search-quick input {
+  padding: 6px 8px;
+}
+
+/* compact select inside controls */
+.panel select,
+.form-grid select {
+  min-width: 120px;
+}
+
+.icon-btn {
+  background: transparent;
+  border: 0;
+  color: inherit;
+  padding: 6px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/* small utility text */
+.small {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* small icon-like buttons used in cards */
+.icon {
+  background: transparent;
+  border: 0;
+  color: inherit;
+  padding: 6px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+/* lightweight loader placeholder */
+.loader {
+  padding: 18px;
+  color: var(--muted);
+  text-align: center;
+}
+
+/* sheet actions layout */
+.sheet-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  padding: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.02);
+}
+
+.btn {
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 0;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btn.primary {
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  color: #032027;
+  box-shadow: var(--elev1);
+}
+
+.btn.ghost {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  color: var(--muted);
+}
+
+.btn.outline {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--muted);
+}
+
+/* layout */
+.main {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: var(--gap);
+  margin-top: 12px;
+}
+
+.sidebar .panel {
+  padding: 12px;
+  border-radius: 12px;
+  background: var(--card);
+  box-shadow: var(--elev1);
+  margin-bottom: 12px;
+}
+
+.profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  display: grid;
+  place-items: center;
+}
+
+/* content */
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.panel.controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background: var(--card);
+  border-radius: 12px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+/* make cards a bit smaller on narrow widths */
+@media (max-width: 1200px) {
+  .grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  }
+}
+
+.small-grid {
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+}
+
+/* card */
+.card {
+  position: relative;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.04),
+    rgba(255, 255, 255, 0.02)
+  );
+  border-radius: var(--radius);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 300px;
+  box-shadow: var(--elev1);
+  transition: all var(--trans-med);
+  border: 1px solid var(--surface);
+}
+
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    transparent 60%,
+    rgba(6, 182, 212, 0.1)
+  );
+  opacity: 0;
+  transition: opacity var(--trans-med);
+}
+
+.card:hover {
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: var(--elev2);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.card:hover::before {
+  opacity: 1;
+}
+
+.poster {
+  position: relative;
+  height: 0;
+  padding-top: 140%;
+  background: #081224;
+}
+
+.poster img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.meta {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.title {
+  font-family: var(--title-font);
+  font-size: 15px;
+}
+
+.sub {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.pbar {
+  height: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.pbar > i {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+}
+
+/* discover */
+.discover-sections .section {
+  margin-bottom: 12px;
+}
+
+/* modal */
+.modal {
+  position: fixed;
+  inset: 0;
+  display: none;
+  place-items: center;
+  background: rgba(1, 6, 12, 0.7);
+  backdrop-filter: blur(4px);
+  z-index: 80;
+  padding: 1rem;
+}
+
+.modal[aria-hidden="false"] {
+  display: grid;
+  animation: modalFadeIn var(--trans-med) forwards;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.sheet {
+  width: 100%;
+  max-width: 760px;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(
+    180deg,
+    var(--card) 0%,
+    rgba(14, 22, 38, 0.95) 100%
+  );
+  overflow: hidden;
+  box-shadow: var(--elev3);
+  border: 1px solid var(--surface);
+  opacity: 0;
+  transform: scale(0.95);
+  transition: all var(--trans-med);
+}
+
+.modal[aria-hidden="false"] .sheet {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.sheet-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+}
+
+.sheet-body {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+/* empty */
+.empty {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: center;
+  padding: 28px;
+  border-radius: 12px;
+  background: var(--glass);
+  color: var(--muted);
+}
+
+/* Prevent the empty-state image from becoming huge */
+.empty img {
+  max-width: 380px;
+  max-height: 420px;
+  width: auto;
+  height: auto;
+  border-radius: 10px;
+  box-shadow: var(--elev1);
+  object-fit: cover;
+}
+
+/* make empty content stack on small widths */
+.empty > div {
+  max-width: 300px;
+}
+
+/* quick-search clear button styling */
+.search-quick button {
+  border: 0;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 6px 8px;
+  margin-right: 2px;
+  border-radius: 8px;
+  display: inline-grid;
+  place-items: center;
+  cursor: pointer;
+}
+
+.search-quick button:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* toast */
+.toast {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  padding: 10px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  display: none;
+}
+
+.toast.show {
+  display: block;
+}
+
+/* responsive */
+/* Make layout stack earlier on medium screens for better usability */
+@media (max-width: 900px) {
+  .main {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    order: 2;
+  }
+
+  .content {
+    order: 1;
+  }
+
+  .search-quick input {
+    width: 140px;
+  }
+}
+
+@media (max-width: 720px) {
+  /* stack topbar: brand on top, tabs and actions below */
+  .tabs {
+    order: 2;
+    width: 100%;
+    margin: 10px 0;
+    justify-content: flex-start;
+  }
+
+  .top-actions {
+    order: 3;
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .search-quick input {
+    width: 160px;
+  }
+
+  .brand {
+    order: 1;
+  }
+
+  /* hide large empty artwork on small screens to save space */
+  .empty img {
+    display: none;
+  }
+
+  /* compact modal sheet on small devices */
+  .sheet {
+    margin: 14px;
+    max-width: calc(100% - 28px);
+  }
+}
+
+@media (max-width: 420px) {
+  .tabs {
+    justify-content: center;
+  }
+
+  .search-quick input {
+    width: 120px;
+  }
+
+  .btn {
+    padding: 6px 10px;
+  }
+
+  .poster {
+    padding-top: 130%;
+  }
+
+  .brand-text h1 {
+    font-size: 18px;
+  }
+}
+
+/* Make form and posters more compact on small devices */
+@media (max-width: 560px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .poster {
+    padding-top: 120%;
+  }
+
+  .card {
+    min-height: 260px;
+    /* reduce card height slightly for small screens */
+  }
+}
+
+/* Improve card sizing on very narrow screens to avoid overflow */
+@media (max-width: 360px) {
+  .grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 10px;
+  }
+
+  .poster {
+    padding-top: 140%;
+  }
+}
+
+/* Smooth global motion and animations */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Prevent accidental horizontal overflow on small devices and allow flex children to shrink */
+html,
+body {
+  overflow-x: hidden;
+}
+
+/* Allow flex and grid children to shrink instead of overflowing */
+.topbar,
+.brand,
+.tabs,
+.top-actions,
+.content,
+.panel,
+.grid,
+.card,
+.meta,
+.brand-text {
+  min-width: 0;
+}
+
+/* Let tab list wrap onto multiple lines if needed */
+.tabs {
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* Prevent long titles from forcing width */
+.brand-text h1,
+.title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Make search input flexible and not force width */
+.search-quick {
+  max-width: 100%;
+}
+
+.search-quick input {
+  min-width: 0;
+  width: 100%;
+}
+
+/* Ensure images never exceed their containers */
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* gentle default transitions for interactive properties */
+:root {
+  --motion: 160ms;
+  --motion-ease: cubic-bezier(0.2, 0.9, 0.2, 1);
+}
+
+button,
+.btn,
+input,
+select,
+.card,
+.tab,
+.icon-btn {
+  transition: background-color var(--motion) var(--motion-ease),
+    color var(--motion) var(--motion-ease),
+    box-shadow var(--motion) var(--motion-ease),
+    transform var(--motion) var(--motion-ease),
+    opacity var(--motion) var(--motion-ease);
+}
+
+/* modal fade/scale */
+.modal {
+  opacity: 0;
+  transition: opacity calc(var(--motion) * 1.2) var(--motion-ease);
+}
+
+.modal[aria-hidden="false"] {
+  opacity: 1;
+}
+
+.sheet {
+  transform: translateY(6px);
+  transition: transform calc(var(--motion) * 1.2) var(--motion-ease);
+}
+
+.modal[aria-hidden="false"] .sheet {
+  transform: translateY(0);
+}
+
+/* fade in for tab content children when activated */
+.tab-panel .panel,
+.tab-panel .grid {
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity calc(var(--motion) * 1.1) var(--motion-ease),
+    transform calc(var(--motion) * 1.1) var(--motion-ease);
+}
+
+.tab-panel.active .panel,
+.tab-panel.active .grid {
+  opacity: 1;
+  transform: none;
+}
+
+/* subtle card image fade */
+.poster img {
+  transition: opacity calc(var(--motion) * 1.2) var(--motion-ease),
+    transform calc(var(--motion) * 1.2) var(--motion-ease);
+}
+
+.card:hover .poster img {
+  transform: scale(1.02);
+}
+
+/* hide scrollbars across the site */
+html,
+body,
+.content,
+.grid,
+.discover-sections,
+.panel {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar,
+.content::-webkit-scrollbar,
+.grid::-webkit-scrollbar,
+.discover-sections::-webkit-scrollbar,
+.panel::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+/* Respect user preference for reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --motion: 1ms;
+  }
+
+  * {
+    animation-duration: 1ms !important;
+    transition-duration: 1ms !important;
+  }
+}
+
+/* Target touch devices (large phones / high-res mobiles) and force a mobile-friendly layout
+   even if the device reports a large CSS width. This helps fold the sidebar and make
+   tap targets larger on high-density mobile screens. */
+@media (pointer: coarse) and (orientation: portrait) {
+  :root {
+    --gap: 12px;
+  }
+
+  body {
+    padding-left: env(safe-area-inset-left, 12px);
+    padding-right: env(safe-area-inset-right, 12px);
+  }
+
+  .main {
+    grid-template-columns: 1fr !important;
+    /* force single column on touch portrait */
+  }
+
+  .sidebar {
+    order: 2;
+    width: 100%;
+  }
+
+  .topbar .logo {
+    width: 48px;
+    height: 48px;
+  }
+
+  .tabs {
+    justify-content: flex-start !important;
+  }
+
+  /* Slightly larger buttons for easier tapping */
+  .btn,
+  .icon,
+  .icon-btn {
+    padding: 10px 14px;
+  }
+
+  .search-quick input {
+    width: 100%;
+  }
+}
+
+/* Also handle landscape on coarse pointers (e.g., large phones turned sideways) */
+@media (pointer: coarse) and (orientation: landscape) {
+  .main {
+    grid-template-columns: 1fr !important;
+  }
+
+  .tabs {
+    flex-wrap: wrap;
+  }
+}
