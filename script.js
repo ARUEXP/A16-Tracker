@@ -19,9 +19,9 @@ const escape = (s) =>
   String(s || "").replace(
     /[&<>"']/g,
     (c) =>
-    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[
-      c
-    ])
+      ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[
+        c
+      ])
   );
 const uid = () =>
   "id" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
@@ -57,35 +57,125 @@ try {
   console.warn("settings load");
 }
 function saveState() {
-  localStorage.setItem(LS_KEY, JSON.stringify(state));
+  try {
+    const serialized = JSON.stringify(state);
+    localStorage.setItem(LS_KEY, serialized);
+    return true;
+  } catch (error) {
+    console.error("Failed to save state:", error);
+    toast("Failed to save changes. Storage might be full.");
+    return false;
+  }
 }
+
 function saveSettings() {
-  localStorage.setItem(LS_SETTINGS, JSON.stringify(settings));
-  applySettings();
+  try {
+    const serialized = JSON.stringify(settings);
+    localStorage.setItem(LS_SETTINGS, serialized);
+    applySettings();
+    return true;
+  } catch (error) {
+    console.error("Failed to save settings:", error);
+    toast("Failed to save settings. Storage might be full.");
+    return false;
+  }
 }
 
 /* ========== CACHE (memory + localStorage optional) ========== */
+// Memory cache for faster access and to reduce localStorage writes
+const memoryCache = new Map();
+
 const cacheKey = (k) => `a16_cache_${k}`;
+
 function cacheSet(key, data) {
   const obj = { ts: Date.now(), data };
+  const cKey = cacheKey(key);
+
+  // Update memory cache first
+  memoryCache.set(cKey, obj);
+
   try {
-    localStorage.setItem(cacheKey(key), JSON.stringify(obj));
-  } catch (e) { }
+    localStorage.setItem(cKey, JSON.stringify(obj));
+  } catch (e) {
+    console.warn("Cache write failed:", e);
+    // If localStorage fails, we still have memory cache
+    try {
+      // Try to clean up old items to make space
+      for (let k of Object.keys(localStorage)) {
+        if (k.startsWith("a16_cache_")) {
+          localStorage.removeItem(k);
+        }
+      }
+      // Try one more time
+      localStorage.setItem(cKey, JSON.stringify(obj));
+    } catch (e2) {
+      console.error("Cache cleanup and retry failed:", e2);
+    }
+  }
 }
+
 function cacheGet(key) {
+  const cKey = cacheKey(key);
+
+  // Check memory cache first for better performance
+  const memItem = memoryCache.get(cKey);
+  if (memItem) {
+    if (Date.now() - memItem.ts <= CACHE_TTL) {
+      return memItem.data;
+    } else {
+      memoryCache.delete(cKey);
+    }
+  }
+
   try {
-    const raw = localStorage.getItem(cacheKey(key));
+    const raw = localStorage.getItem(cKey);
     if (!raw) return null;
+
     const o = JSON.parse(raw);
     if (Date.now() - o.ts > CACHE_TTL) {
-      localStorage.removeItem(cacheKey(key));
+      localStorage.removeItem(cKey);
       return null;
     }
+
+    // Update memory cache with valid data
+    memoryCache.set(cKey, o);
     return o.data;
   } catch (e) {
+    console.warn("Cache read failed:", e);
     return null;
   }
 }
+
+// Clean up expired cache items periodically
+setInterval(() => {
+  const now = Date.now();
+
+  // Clean memory cache
+  for (let [key, value] of memoryCache.entries()) {
+    if (now - value.ts > CACHE_TTL) {
+      memoryCache.delete(key);
+    }
+  }
+
+  // Clean localStorage cache
+  try {
+    for (let k of Object.keys(localStorage)) {
+      if (k.startsWith("a16_cache_")) {
+        try {
+          const item = JSON.parse(localStorage.getItem(k));
+          if (now - item.ts > CACHE_TTL) {
+            localStorage.removeItem(k);
+          }
+        } catch (e) {
+          // Remove invalid cache entries
+          localStorage.removeItem(k);
+        }
+      }
+    }
+  } catch (e) {
+    console.warn("Cache cleanup failed:", e);
+  }
+}, CACHE_TTL);
 
 /* ========== DOM refs & init ========== */
 document.addEventListener("DOMContentLoaded", init);
@@ -220,8 +310,9 @@ function cardFor(item) {
   meta.innerHTML = `<div class="title">${escape(
     item.title
   )}</div><div class="sub">${escape(item.alt || "")}</div>
-    <div class="small">Status: ${item.status} • ${item.watched}/${item.total
-    } • Rating: ${item.rating || "—"}</div>
+    <div class="small">Status: ${item.status} • ${item.watched}/${
+    item.total
+  } • Rating: ${item.rating || "—"}</div>
     <div class="pbar"><i style="width:${prog(item)}%"></i></div>
     <div style="display:flex;justify-content:space-between;margin-top:8px">
       <div style="display:flex;gap:8px"><button class="icon" data-act="inc">+</button><button class="icon" data-act="dec">−</button></div>
@@ -301,11 +392,70 @@ function closeModal() {
   $("#modal").style.display = "none";
 }
 
+function validateAnimeForm(form) {
+  const errors = [];
+
+  // Title validation
+  const title = form.title.value.trim();
+  if (!title) {
+    errors.push("Title is required");
+  } else if (title.length < 2) {
+    errors.push("Title must be at least 2 characters");
+  } else if (title.length > 200) {
+    errors.push("Title must not exceed 200 characters");
+  }
+
+  // Episodes validation
+  const total = Number(form.total.value);
+  if (isNaN(total) || total < 1) {
+    errors.push("Total episodes must be at least 1");
+  } else if (total > 2000) {
+    errors.push("Total episodes seems too high (max 2000)");
+  }
+
+  const watched = Number(form.watched.value);
+  if (isNaN(watched) || watched < 0) {
+    errors.push("Episodes watched must be 0 or higher");
+  } else if (watched > total) {
+    errors.push("Episodes watched cannot exceed total episodes");
+  }
+
+  // Image URL validation
+  const imageUrl = form.image.value.trim();
+  if (imageUrl && !imageUrl.match(/^https?:\/\/.+/i)) {
+    errors.push("Image URL must start with http:// or https://");
+  }
+
+  // Rating validation
+  const rating = form.rating.value;
+  if (
+    rating &&
+    (isNaN(Number(rating)) || Number(rating) < 1 || Number(rating) > 10)
+  ) {
+    errors.push("Rating must be between 1 and 10");
+  }
+
+  // Status validation
+  const validStatuses = ["watching", "completed", "onhold", "dropped", "plan"];
+  if (!validStatuses.includes(form.status.value)) {
+    errors.push("Invalid status selected");
+  }
+
+  return errors;
+}
+
 async function onSaveAnime(e) {
   e.preventDefault();
   const f = e.target;
+
+  // Validate form
+  const errors = validateAnimeForm(f);
+  if (errors.length > 0) {
+    alert(errors.join("\n"));
+    return;
+  }
+
   const title = f.title.value.trim();
-  if (!title) return alert("Title required");
   const payload = {
     id: f.dataset.editing || uid(),
     title,
@@ -370,19 +520,95 @@ async function autoFillCover() {
   toast("Fallback cover used");
 }
 
-/* ========== AniList GraphQL helpers ========== */
+/* ========== AniList GraphQL helpers with Rate Limiting ========== */
+const API_RATE_LIMIT = {
+  maxRequests: 90, // AniList allows 90 requests per minute
+  windowMs: 60 * 1000, // 1 minute window
+  requests: [],
+};
+
+async function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function waitForRateLimit() {
+  const now = Date.now();
+
+  // Clean up old requests
+  API_RATE_LIMIT.requests = API_RATE_LIMIT.requests.filter(
+    (time) => now - time < API_RATE_LIMIT.windowMs
+  );
+
+  if (API_RATE_LIMIT.requests.length >= API_RATE_LIMIT.maxRequests) {
+    // Calculate how long to wait
+    const oldestRequest = API_RATE_LIMIT.requests[0];
+    const waitTime = API_RATE_LIMIT.windowMs - (now - oldestRequest);
+
+    if (waitTime > 0) {
+      console.warn(
+        `Rate limit reached, waiting ${Math.ceil(waitTime / 1000)}s...`
+      );
+      await sleep(waitTime);
+    }
+  }
+
+  // Add this request to the queue
+  API_RATE_LIMIT.requests.push(now);
+}
+
 async function aniListGraphQL(query, variables = {}) {
-  // small wrapper with error handling
-  const res = await fetch(ANILIST_GRAPHQL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json", Accept: "application/json" },
-    body: JSON.stringify({ query, variables }),
-  });
-  if (!res.ok) throw new Error("AniList network error " + res.status);
-  const json = await res.json();
-  if (json.errors)
-    throw new Error(json.errors.map((x) => x.message).join("; "));
-  return json.data;
+  // Wait for rate limit if needed
+  await waitForRateLimit();
+
+  try {
+    const res = await fetch(ANILIST_GRAPHQL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        // Add user agent to be more respectful to the API
+        "User-Agent": "A16-Tracker/2.0 (github.com/ARUEXP/A16-Tracker)",
+      },
+      body: JSON.stringify({ query, variables }),
+    });
+
+    // Handle rate limit headers if provided
+    const remaining = res.headers.get("X-RateLimit-Remaining");
+    if (remaining !== null) {
+      const remainingNum = parseInt(remaining, 10);
+      if (!isNaN(remainingNum) && remainingNum < 10) {
+        // If less than 10 requests remaining, add artificial delay
+        await sleep(1000);
+      }
+    }
+
+    if (!res.ok) {
+      if (res.status === 429) {
+        // Rate limit exceeded
+        const retryAfter = res.headers.get("Retry-After");
+        const waitTime = (retryAfter ? parseInt(retryAfter, 10) : 60) * 1000;
+        await sleep(waitTime);
+        // Retry the request
+        return aniListGraphQL(query, variables);
+      }
+      throw new Error("AniList network error " + res.status);
+    }
+
+    const json = await res.json();
+    if (json.errors) {
+      throw new Error(json.errors.map((x) => x.message).join("; "));
+    }
+
+    return json.data;
+  } catch (error) {
+    console.error("AniList API error:", error);
+    // If it's a network error, retry after a delay
+    if (error.name === "TypeError" && error.message.includes("network")) {
+      await sleep(5000);
+      return aniListGraphQL(query, variables);
+    }
+    throw error;
+  }
 }
 
 async function aniListSearchTitle(title) {
@@ -506,13 +732,16 @@ function renderDiscoverSection(containerId, items) {
     meta.innerHTML = `<div class="title">${escape(
       m.title?.romaji || m.title?.english
     )}</div>
-      <div class="sub">Episodes: ${m.episodes || "?"} • Score: ${m.averageScore || "—"
-      }</div>
+      <div class="sub">Episodes: ${m.episodes || "?"} • Score: ${
+      m.averageScore || "—"
+    }</div>
       <div style="margin-top:auto;display:flex;justify-content:space-between">
-        <button class="btn primary" data-id="${m.id
-      }" data-action="add">Add</button>
-        <button class="btn ghost" data-id="${m.id
-      }" data-action="view">View</button>
+        <button class="btn primary" data-id="${
+          m.id
+        }" data-action="add">Add</button>
+        <button class="btn ghost" data-id="${
+          m.id
+        }" data-action="view">View</button>
       </div>`;
     card.appendChild(poster);
     card.appendChild(meta);
@@ -582,11 +811,14 @@ async function onSearchForm(e) {
       meta.className = "meta";
       meta.innerHTML = `<div class="title">${escape(
         m.title?.romaji || m.title?.english
-      )}</div><div class="sub">Episodes: ${m.episodes || "?"} • Score: ${m.averageScore || "—"
-        }</div>
-        <div style="margin-top:auto;display:flex;gap:8px"><button class="btn primary" data-id="${m.id
-        }" data-action="add">Add</button><button class="btn ghost" data-id="${m.id
-        }" data-action="view">View</button></div>`;
+      )}</div><div class="sub">Episodes: ${m.episodes || "?"} • Score: ${
+        m.averageScore || "—"
+      }</div>
+        <div style="margin-top:auto;display:flex;gap:8px"><button class="btn primary" data-id="${
+          m.id
+        }" data-action="add">Add</button><button class="btn ghost" data-id="${
+        m.id
+      }" data-action="view">View</button></div>`;
       c.appendChild(p);
       c.appendChild(meta);
       container.appendChild(c);
@@ -667,11 +899,87 @@ function unsplashFallback(title = "anime poster") {
 function clamp(v, a, b) {
   return Math.max(a, Math.min(b, v));
 }
-function debounce(fn, t = 200) {
-  let h;
-  return (...a) => {
-    clearTimeout(h);
-    h = setTimeout(() => fn(...a), t);
+function debounce(fn, wait = 200, options = {}) {
+  let timeoutId;
+  let lastArgs;
+  let lastThis;
+  let lastCallTime;
+  let lastInvokeTime = 0;
+  let maxWait = options.maxWait;
+  let leading = !!options.leading;
+  let trailing = "trailing" in options ? !!options.trailing : true;
+
+  function invokeFunc() {
+    const args = lastArgs;
+    const thisArg = lastThis;
+
+    lastArgs = lastThis = undefined;
+    lastInvokeTime = Date.now();
+
+    if (fn.apply) {
+      fn.apply(thisArg, args);
+    } else {
+      fn(...(args || []));
+    }
+  }
+
+  function startTimer(pendingFunc, wait) {
+    if (timeoutId !== undefined) {
+      clearTimeout(timeoutId);
+    }
+    timeoutId = setTimeout(pendingFunc, wait);
+  }
+
+  function cancelTimer() {
+    if (timeoutId !== undefined) {
+      clearTimeout(timeoutId);
+    }
+  }
+
+  function shouldInvoke(time) {
+    const timeSinceLastCall = time - lastCallTime;
+    const timeSinceLastInvoke = time - lastInvokeTime;
+
+    return (
+      lastCallTime === undefined ||
+      timeSinceLastCall >= wait ||
+      timeSinceLastCall < 0 ||
+      (maxWait !== undefined && timeSinceLastInvoke >= maxWait)
+    );
+  }
+
+  function remainingWait(time) {
+    const timeSinceLastCall = time - lastCallTime;
+    const timeSinceLastInvoke = time - lastInvokeTime;
+    const timeWaiting = wait - timeSinceLastCall;
+
+    return maxWait === undefined
+      ? timeWaiting
+      : Math.min(timeWaiting, maxWait - timeSinceLastInvoke);
+  }
+
+  return function (...args) {
+    const time = Date.now();
+    const isInvoking = shouldInvoke(time);
+
+    lastArgs = args;
+    lastThis = this;
+    lastCallTime = time;
+
+    if (isInvoking) {
+      if (timeoutId === undefined && leading) {
+        lastInvokeTime = lastCallTime;
+        startTimer(invokeFunc, wait);
+        return invokeFunc();
+      }
+      if (maxWait !== undefined) {
+        startTimer(invokeFunc, wait);
+        return invokeFunc();
+      }
+    }
+    if (timeoutId === undefined && trailing) {
+      startTimer(invokeFunc, wait);
+    }
   };
 }
 
