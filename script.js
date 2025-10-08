@@ -32,8 +32,19 @@ document.addEventListener("DOMContentLoaded", () => {
         '<div class="empty-state"><p>Enter a query and hit search to find anime.</p></div>';
   }
 
-  // Set default tab on load
-  activateTab("tracker");
+  // Hide all tab panels except tracker on load
+  Object.values(tabPanels).forEach((sel) => {
+    const panel = $(sel);
+    if (panel) {
+      panel.classList.remove("active");
+      panel.style.display = "none";
+    }
+  });
+  $(tabPanels["tracker"]).classList.add("active");
+  $(tabPanels["tracker"]).style.display = "block";
+  // Optionally, set the tracker tab button as active
+  $$("nav .tab").forEach((b) => b.classList.remove("active"));
+  $("#trackerTab").classList.add("active");
   // ---------- Tab Navigation ----------
   const tabPanels = {
     tracker: "#tracker",
