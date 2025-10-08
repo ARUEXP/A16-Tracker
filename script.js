@@ -194,9 +194,12 @@ function renderTracker() {
 
     card.classList.add(`status-${item.status}`);
 
+    // FIX: Ensure item.image is a string for onerror handling
+    const image_url = item.image || "";
+
     card.innerHTML = `
       <div class="poster">
-        <img src="${item.image || ""}" alt="${
+        <img src="${image_url}" alt="${
       item.title
     }" loading="lazy" onerror="this.onerror=null; this.src='';">
       </div>
@@ -621,6 +624,8 @@ function renderDiscoverCard(grid) {
   return function (a) {
     const c = document.createElement("div");
     c.className = "card animate__animated animate__fadeIn";
+
+    // Ensure image URL is always a string, even if empty
     const imgUrl = a.coverImage?.large || "";
     const studios =
       a.studios?.nodes
@@ -635,6 +640,7 @@ function renderDiscoverCard(grid) {
         id: uid(),
         title: title,
         alt: a.title?.english || "",
+        // Use default setting if episodes is null or 0 from API
         total: a.episodes || getSetting("defaultEpisodes", 12),
         watched: 0,
         status: "plan",
@@ -739,11 +745,12 @@ $("#searchForm")?.addEventListener("submit", async (e) => {
       const title =
         a.title?.romaji || a.title?.english || a.title?.native || "Untitled";
 
+      // Ensure image URL is always a string, even if empty
+      const imgUrl = a.coverImage?.medium || a.coverImage?.large || "";
+
       c.innerHTML = `
             <div class="poster">
-                <img src="${
-                  a.coverImage?.medium || a.coverImage?.large || ""
-                }" alt="${title}">
+                <img src="${imgUrl}" alt="${title}" onerror="this.onerror=null; this.src='';">
             </div>
             <div class="meta">
                 <div class="title" title="${title}">${title}</div>

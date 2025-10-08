@@ -1,11 +1,11 @@
 /* =======================================
-    Android 16 Material Expressive CSS
+    Android 16 Material Expressive CSS - MAX POLISH
 ========================================= */
 
 /* --- Tonal Palette & Expressive Variables --- */
 :root {
   /* Primary Colors */
-  --color-primary: #8a7cff; /* Deep expressive violet */
+  --color-primary: #8a7cff;
   --color-on-primary: #000030;
   --color-primary-container: #d9cfff;
 
@@ -17,30 +17,33 @@
   --color-on-surface-variant: #c9c4d2;
 
   /* Expressive Accents */
-  --color-secondary: #00bcd4; /* Cyan/Aqua */
-  --color-outline: #8d8c97;
+  --color-secondary: #00bcd4;
+  --color-outline: #5c5a63; /* Slightly darker outline for better contrast */
 
   /* Expressive Shadows/Depths */
   --shadow-depth1: 0 1px 3px rgba(0, 0, 0, 0.5), 0 1px 2px rgba(0, 0, 0, 0.9);
-  --shadow-depth2: 0 4px 6px rgba(0, 0, 0, 0.5), 0 2px 4px rgba(0, 0, 0, 0.7);
-  --shadow-depth3: 0 10px 20px rgba(0, 0, 0, 0.6), 0 6px 6px rgba(0, 0, 0, 0.8);
+  --shadow-depth2: 0 4px 8px rgba(0, 0, 0, 0.5), 0 2px 4px rgba(0, 0, 0, 0.7);
+  --shadow-depth3: 0 12px 24px rgba(0, 0, 0, 0.7), 0 6px 8px rgba(0, 0, 0, 0.9);
 
   /* Shape & Typography */
   --radius-small: 8px;
   --radius-medium: 16px;
-  --radius-large: 32px;
-  --font-expressive: "Inter", sans-serif;
-  --font-bungee: "Bungee Outline", sans-serif;
+  --radius-large: 24px; /* Slightly smaller for cleaner polish */
+
+  /* FONT UPDATE */
+  --font-primary: "Montserrat", sans-serif;
+  --font-secondary: "Poppins", sans-serif;
 }
 
-/* --- Base & Scrollbar --- */
+/* --- Base & Polish --- */
 * {
   box-sizing: border-box;
-  transition: background-color 0.3s, color 0.3s, box-shadow 0.3s, transform 0.2s;
+  /* Use a more subtle transition duration */
+  transition: background-color 0.2s, color 0.2s, box-shadow 0.2s, transform 0.1s;
 }
 
 body {
-  font-family: var(--font-expressive);
+  font-family: var(--font-primary);
   background-color: var(--color-surface-dim);
   color: var(--color-on-surface);
   margin: 0;
@@ -48,52 +51,23 @@ body {
   min-height: 100vh;
 }
 
-/* Custom Scrollbar for Expressive Feel */
-body::-webkit-scrollbar {
-  width: 8px;
-}
-body::-webkit-scrollbar-thumb {
-  background-color: var(--color-primary);
-  border-radius: 4px;
-}
-body::-webkit-scrollbar-track {
-  background-color: var(--color-surface-dim);
-}
-
-/* --- Typography --- */
-h1,
-h2,
-h3 {
-  font-weight: 700;
-  letter-spacing: -0.02em; /* Tighter spacing for modern/expressive look */
-  color: var(--color-primary-container);
-}
-
-.expressive-title {
-  font-size: 2.5rem;
-  padding: 1rem 0;
-  text-shadow: var(--shadow-depth2);
-}
-
-.bungee-font {
-  font-family: var(--font-bungee);
-  font-size: 1.2em;
-  color: var(--color-secondary);
-}
-
-/* --- General Layout --- */
+/* --- Header & Topbar Polish (MINIMUM HEIGHT) --- */
 #app {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 1rem;
+  /* Reduced padding for less wasted space */
+  padding: 0.5rem 1rem;
 }
 
 header {
   display: flex;
-  flex-direction: column;
+  /* Switch to row layout on desktop for a compact bar */
+  flex-direction: row;
+  justify-content: space-between;
   align-items: center;
-  padding-bottom: 1.5rem;
-  gap: 1rem;
+  /* Reduced padding */
+  padding: 0.5rem 0;
+  gap: 1.5rem;
   position: sticky;
   top: 0;
   z-index: 100;
@@ -102,614 +76,191 @@ header {
   background-color: rgba(var(--color-surface-dim), 0.8);
   backdrop-filter: blur(16px) saturate(1.5);
   -webkit-backdrop-filter: blur(16px) saturate(1.5);
-  box-shadow: var(--shadow-depth2);
-  border-bottom-left-radius: var(--radius-large);
-  border-bottom-right-radius: var(--radius-large);
+  box-shadow: var(--shadow-depth3);
+  border-radius: 0 0 var(--radius-large) var(--radius-large);
 }
 
-main {
-  padding-top: 2rem;
+.expressive-title {
+  font-size: 1.8rem; /* Reduced font size */
+  padding: 0;
+  margin: 0;
+  text-shadow: var(--shadow-depth1);
 }
 
-.tab-panel {
-  display: none;
-  animation: fadeIn 0.5s ease-out;
-}
-.tab-panel.active {
-  display: block;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* --- M3 Component Styling --- */
-
-/* Tabs (Navigation Rail) */
+/* --- Tab Navigation Polish --- */
 nav {
   display: flex;
   background-color: var(--color-surface-bright);
-  border-radius: var(--radius-large);
-  padding: 0.5rem;
+  border-radius: 999px; /* Perfect pill shape */
+  padding: 0.35rem; /* Reduced padding */
   box-shadow: var(--shadow-depth2);
 }
 .tab {
-  background: transparent;
-  border: none;
-  color: var(--color-on-surface-variant);
-  padding: 0.75rem 1.5rem;
-  border-radius: 999px; /* Pill shape */
-  cursor: pointer;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-.tab:hover {
-  background-color: rgba(var(--color-primary-container), 0.1);
+  padding: 0.6rem 1.25rem; /* Polished padding */
+  font-size: 0.9rem;
 }
 .tab.active {
-  background-color: var(--color-primary-container);
-  color: var(--color-on-primary);
-  box-shadow: var(--shadow-depth1) inset;
-  transform: scale(1.05); /* Expressive press effect */
+  transform: none; /* Removed scale for cleaner transitions */
 }
 
-/* Buttons (M3 Primary, Secondary, Danger, FAB) */
-.m3-button,
-.m3-fab {
-  padding: 0.75rem 1.5rem;
-  border-radius: var(--radius-medium);
-  border: 1px solid transparent;
-  cursor: pointer;
-  font-weight: 600;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  text-transform: capitalize; /* Cleaner look */
+/* --- Main Content & Spacing --- */
+main {
+  padding-top: 2rem;
+  padding-bottom: 4rem; /* Extra space for FAB clearance */
 }
 
-.m3-button.primary,
-.m3-fab.primary {
-  background-color: var(--color-primary);
-  color: var(--color-on-primary);
-  box-shadow: var(--shadow-depth2);
-}
-.m3-button.secondary,
-.m3-fab.secondary {
-  background-color: var(--color-surface-bright);
-  color: var(--color-on-surface);
-  border-color: var(--color-outline);
-}
-.m3-button.danger {
-  background-color: #ba1a1a; /* M3 Error */
-  color: #ffffff;
-}
-
-.m3-button:active,
-.m3-fab:active {
-  transform: scale(0.98);
-}
-
-.m3-fab {
-  position: fixed;
-  bottom: 2rem;
-  right: 2rem;
-  padding: 1rem 2rem;
-  font-size: 1.1rem;
-  z-index: 50;
-  /* Irregular/Expressive Shape */
-  border-radius: var(--radius-large) var(--radius-small) var(--radius-large)
-    var(--radius-medium);
-}
-
-.m3-icon-btn {
-  background: none;
-  border: none;
-  color: var(--color-on-surface-variant);
-  cursor: pointer;
-  padding: 8px;
-  border-radius: 50%;
-  font-size: 1.5rem;
-}
-.m3-icon-btn:hover {
-  background-color: rgba(var(--color-primary-container), 0.1);
-}
-
-/* Inputs & Selects (M3 Filled style) */
-.m3-input,
-.m3-select {
-  padding: 0.75rem;
-  border: 2px solid var(--color-outline);
-  border-radius: var(--radius-small);
-  background-color: var(--color-surface-bright);
-  color: var(--color-on-surface);
-  font-size: 1rem;
-  box-shadow: var(--shadow-depth1);
-}
-.m3-input:focus,
-.m3-select:focus {
-  border-color: var(--color-primary);
-  outline: none;
-  box-shadow: 0 0 0 3px var(--color-primary-container);
-}
-.m3-input.large {
-  flex-grow: 1;
-}
-.m3-input.small {
-  width: 120px;
-}
-.m3-select.small {
-  max-width: 150px;
-}
-
-/* Checkbox (M3 Custom) */
-.m3-checkbox-label {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  cursor: pointer;
-  font-weight: 500;
-}
-.m3-checkbox-custom {
-  display: inline-block;
-  width: 20px;
-  height: 20px;
-  border: 2px solid var(--color-primary);
-  border-radius: var(--radius-small);
-  background-color: var(--color-surface-bright);
-  position: relative;
-}
-.m3-checkbox-label input[type="checkbox"] {
-  display: none;
-}
-.m3-checkbox-label input[type="checkbox"]:checked + .m3-checkbox-custom {
-  background-color: var(--color-primary);
-  border-color: var(--color-primary);
-}
-.m3-checkbox-label input[type="checkbox"]:checked + .m3-checkbox-custom::after {
-  content: "\e5ca"; /* MDI Checkmark */
-  font-family: "Material Design Icons";
-  font-size: 16px;
-  color: var(--color-on-primary);
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
-
-/* Card (M3 Expressive Shape) */
-.m3-card {
-  background-color: var(--color-surface);
-  border-radius: var(--radius-large) var(--radius-small) var(--radius-large)
-    var(--radius-medium); /* Irregular shape */
-  padding: 1.5rem;
-  box-shadow: var(--shadow-depth3);
-  border: 1px solid rgba(var(--color-primary-container), 0.1);
-}
-.m3-card.stats-card {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-}
-
-/* --- Layout Specifics --- */
-
-/* Control Bars */
+/* Controls/Filter Bar Polish */
 .controls-area {
-  display: flex;
-  gap: 1rem;
+  gap: 0.75rem; /* Proper spacing */
   margin-bottom: 2rem;
   padding: 1rem;
-  background-color: var(--color-surface-bright);
   border-radius: var(--radius-medium);
-  box-shadow: var(--shadow-depth2);
-  flex-wrap: wrap;
 }
 .filter-group {
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
+  gap: 0.75rem;
 }
-.input-with-button {
-  display: flex;
-  gap: 0.5rem;
+.m3-input,
+.m3-select {
+  padding: 0.6rem 0.75rem; /* Polished input height */
+  border-width: 1px; /* Subtle border */
+  box-shadow: var(--shadow-depth1) inset;
 }
 
-/* Tracker Grid Layout */
+/* --- Tracker Grid & Stats Layout --- */
 .tracker-container {
-  display: grid;
-  grid-template-columns: 3fr 1fr; /* Main grid for cards and side stats */
+  grid-template-columns: 4fr 1fr; /* Shift ratio for more card space */
   gap: 2rem;
 }
 
 .card-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 1.5rem;
 }
-.search-results-grid {
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-}
-.discover-grid-container h2 {
-  margin-top: 2.5rem;
-  margin-bottom: 1rem;
-  font-size: 1.8rem;
-  color: var(--color-on-surface);
-  text-shadow: none;
-}
-.discover-grid {
-  padding-bottom: 1rem;
-}
 
-/* Stats Card */
-.stat-card {
-  text-align: center;
-  padding: 0.5rem;
-  background-color: var(--color-surface-bright);
-  border-radius: var(--radius-medium);
-  border: 1px solid var(--color-primary);
-  box-shadow: var(--shadow-depth1);
-}
-.stat-value {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--color-secondary);
-}
-.stat-label {
-  font-size: 0.75rem;
-  color: var(--color-on-surface-variant);
-}
-
-/* --- Anime Card (Expressive Focus) --- */
+/* --- Anime Card Polish --- */
 .card {
-  background-color: var(--color-surface);
-  border-radius: var(
-    --radius-large
-  ); /* Irregular shape handled by inner elements */
-  overflow: hidden;
-  cursor: pointer;
+  border-radius: var(--radius-large) var(--radius-small) var(--radius-medium)
+    var(--radius-large); /* Expressive Shape */
   box-shadow: var(--shadow-depth2);
-  border: 2px solid transparent;
-  position: relative;
+  min-height: 380px;
+  /* Subtle background elevation */
+  background-color: var(--color-surface-bright);
 }
 
 .card:hover {
   box-shadow: var(--shadow-depth3);
-  transform: translateY(-5px) scale(1.02);
-  border-color: var(--color-secondary);
-}
-
-.card.selected {
+  transform: translateY(-3px); /* Subtle lift */
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 4px var(--color-primary);
 }
 
 .card .poster {
   height: 300px;
   position: relative;
   overflow: hidden;
-  /* Use CSS variable set by JS for the image color */
   background-color: var(--card-color, #1a1a1a);
-  border-radius: var(--radius-large) var(--radius-small) var(--radius-medium)
-    var(--radius-large);
+  border-radius: var(--radius-large) var(--radius-small) 0 0; /* Clean top corners */
 }
 
+/* FIX: Image Polish - Remove Color Overlays */
 .card .poster img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
-  mix-blend-mode: screen; /* Expressive color blending */
-  opacity: 0.8;
+  mix-blend-mode: normal; /* **REMOVED COLOR BLEND** */
+  opacity: 1; /* **FULL VIBRANCY** */
 }
 
 .card .meta {
   padding: 1rem;
+  gap: 0.5rem; /* Better spacing inside meta */
 }
 
 .card .title {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: var(--color-primary-container);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  margin-bottom: 0.25rem;
+  font-size: 1rem; /* Slightly smaller for cleaner look */
+  -webkit-line-clamp: 2;
+  margin-bottom: 0;
 }
 .card .sub {
-  font-size: 0.8rem;
-  color: var(--color-on-surface-variant);
-  margin-bottom: 0.5rem;
-}
-
-/* Progress Bar */
-.pbar-text {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.85rem;
-  margin-bottom: 0.25rem;
-}
-.pbar {
-  background-color: var(--color-surface-bright);
-  height: 6px;
-  border-radius: 3px;
-  overflow: hidden;
-  box-shadow: var(--shadow-depth1) inset;
-}
-.pbar i {
-  display: block;
-  height: 100%;
-  background-color: var(--color-secondary);
-  border-radius: 3px;
-}
-
-/* Discover Card Overlay */
-.card-overlay {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 0.75rem;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.2));
-  color: white;
-}
-.card-stats {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.9rem;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-}
-.card-stats .score {
-  color: #ffd700;
-} /* Gold Star */
-.card-stats i {
-  margin-right: 0.2rem;
-}
-.genres {
   font-size: 0.75rem;
-  opacity: 0.8;
+  margin-bottom: 0.75rem;
 }
 
-/* Status-based colors for subtle expressive change */
-.card.status-watching .pbar i {
-  background-color: var(--color-primary);
+/* Discover Card Overlay Polish */
+.card-overlay {
+  padding: 0.5rem 0.75rem;
+  font-family: var(--font-primary);
 }
-.card.status-completed .pbar i {
-  background-color: #66bb6a;
-} /* Green */
-.card.status-plan .pbar i {
-  background-color: #4dd0e1;
-} /* Light Blue */
 
-/* --- Dialog/Modal (Expressive Backdrop) --- */
-.m3-dialog {
-  background-color: var(--color-surface);
-  color: var(--color-on-surface);
-  border: none;
-  border-radius: var(--radius-large);
-  padding: 2rem;
+/* --- FAB Polish --- */
+.m3-fab.extended.primary {
+  /* More expressive, rounded corners */
+  border-radius: 999px;
+  padding: 0.8rem 1.5rem;
+  bottom: 1.5rem;
+  right: 1.5rem;
   box-shadow: var(--shadow-depth3);
-  max-width: 500px;
-  animation: dialogEnter 0.3s ease-out;
+}
+
+/* --- Dialog Polish --- */
+.m3-dialog {
+  border-radius: var(--radius-large);
+  box-shadow: var(--shadow-depth3);
 }
 .m3-dialog::backdrop {
-  background-color: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(8px);
-}
-@keyframes dialogEnter {
-  from {
-    opacity: 0;
-    transform: scale(0.9);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-.dialog-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.5rem;
-}
-.dialog-header h3 {
-  margin: 0;
-  font-size: 1.5rem;
-  color: var(--color-primary);
-}
-.dialog-content {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-.form-row {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-.form-row.split {
-  flex-direction: row;
-  gap: 1rem;
-}
-.form-row.split > div {
-  flex: 1;
-}
-.m3-label {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--color-on-surface-variant);
-}
-.dialog-footer {
-  display: flex;
-  justify-content: flex-end;
-  gap: 1rem;
-  margin-top: 1.5rem;
+  backdrop-filter: blur(10px); /* Increased blur for depth */
 }
 
-/* --- Empty/Loading States --- */
-.empty-state {
-  grid-column: 1 / -1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 4rem 1rem;
-  text-align: center;
-  min-height: 250px;
-  background-color: var(--color-surface-dim);
-  border-radius: var(--radius-large);
-  box-shadow: var(--shadow-depth2) inset;
-}
-.empty i {
-  font-size: 3rem;
-  color: var(--color-outline);
-}
-.empty h3 {
-  font-size: 1.5rem;
-  color: var(--color-on-surface);
-}
+/* --- Responsive Layout (Crucial for Polish) --- */
 
-/* Skeleton Loading Cards */
-.card.skeleton {
-  background-color: var(--color-surface-bright);
-  cursor: default;
-  border: none;
-}
-.card.skeleton:hover {
-  transform: none;
-  box-shadow: var(--shadow-depth2);
-}
-.card.skeleton .poster {
-  background-color: var(--color-surface-dim);
-}
-.card.skeleton .title-skeleton {
-  height: 20px;
-  width: 80%;
-  background-color: var(--color-surface-dim);
-  border-radius: 4px;
-  margin-bottom: 8px;
-  animation: pulse 1.5s infinite ease-in-out;
-}
-.card.skeleton .sub-skeleton {
-  height: 14px;
-  width: 50%;
-  background-color: var(--color-surface-dim);
-  border-radius: 4px;
-  animation: pulse 1.5s 0.2s infinite ease-in-out;
-}
-@keyframes pulse {
-  0% {
-    opacity: 0.5;
-  }
-  50% {
-    opacity: 0.2;
-  }
-  100% {
-    opacity: 0.5;
-  }
-}
-
-/* --- Toast (M3 Snack bar) --- */
-.toast {
-  position: fixed;
-  bottom: 2rem;
-  left: 50%;
-  transform: translateX(-50%) translateY(100px);
-  background-color: var(--color-primary);
-  color: var(--color-on-primary);
-  padding: 0.75rem 1.5rem;
-  border-radius: var(--radius-large);
-  box-shadow: var(--shadow-depth3);
-  z-index: 1000;
-  opacity: 0;
-  visibility: hidden;
-  transition: transform 0.4s ease-out, opacity 0.4s ease-out;
-}
-.toast.show {
-  opacity: 1;
-  visibility: visible;
-  transform: translateX(-50%) translateY(0);
-}
-.toast.success {
-  background-color: #66bb6a;
-} /* Green */
-.toast.danger {
-  background-color: #ba1a1a;
-} /* Red */
-
-/* --- Batch Actions Bar --- */
-.batch-actions-bar {
-  display: flex;
-  gap: 1rem;
-  align-items: center;
-  padding: 0.75rem 1.5rem;
-  margin-bottom: 2rem;
-  background-color: var(--color-surface-bright);
-  border-radius: var(--radius-medium);
-  box-shadow: var(--shadow-depth1);
-  border: 1px dashed var(--color-outline);
-}
-.m3-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  background-color: var(--color-secondary);
-  color: var(--color-on-primary);
-  padding: 0.5rem 1rem;
-  border-radius: 999px;
-  font-weight: 600;
-  font-size: 0.9rem;
-  box-shadow: var(--shadow-depth2);
-}
-
-/* Settings Grid */
-.settings-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 2rem;
-  max-width: 900px;
-  margin: 0 auto;
-}
-.settings-card .button-group {
-  display: flex;
-  gap: 1rem;
-  margin-top: 1rem;
-}
-.danger-text {
-  color: #ba1a1a;
-  font-weight: 600;
-  margin-top: 1rem;
-}
-
-/* Responsive Adjustments */
-@media (max-width: 1000px) {
+/* Tablet & Smaller Desktop */
+@media (max-width: 1200px) {
   .tracker-container {
-    grid-template-columns: 1fr; /* Stack tracker and stats */
-  }
-  .m3-fab.extended {
-    width: auto;
-    padding: 0.75rem 1.5rem;
+    grid-template-columns: 3fr 1fr;
+    gap: 1.5rem;
   }
 }
+
+/* Mobile (Less than 768px) */
 @media (max-width: 768px) {
+  /* Header Stack/Min-Height Fix */
   header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+    padding: 0.5rem 1rem 1rem;
     border-radius: 0;
   }
+  .expressive-title {
+    text-align: center;
+    font-size: 2rem;
+  }
+
+  /* Center the Navigation Tabs */
+  nav {
+    justify-content: center;
+    padding: 0.25rem;
+    width: 100%;
+  }
+  .tab {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.85rem;
+  }
+
+  /* Stack Main Content */
+  .tracker-container {
+    grid-template-columns: 1fr; /* Stack tracker and stats */
+    gap: 1rem;
+  }
+
+  /* Controls/Filter Bar */
   .controls-area {
     flex-direction: column;
     align-items: stretch;
+    padding: 0.75rem;
   }
   .filter-group {
     flex-wrap: wrap;
+    justify-content: space-between;
   }
   .m3-input,
   .m3-select {
@@ -719,12 +270,32 @@ nav {
   .m3-select.small {
     width: auto;
     max-width: none;
+    flex-grow: 1;
   }
-  .m3-fab {
-    bottom: 1rem;
-    right: 1rem;
+
+  /* Card Grid */
+  .card-grid {
+    grid-template-columns: repeat(
+      auto-fill,
+      minmax(150px, 1fr)
+    ); /* Smaller cards on mobile */
+    gap: 1rem;
   }
-  .batch-actions-bar {
-    flex-wrap: wrap;
+  .card .poster {
+    height: 220px; /* Reduced height for better fit */
+  }
+  .card {
+    min-height: 300px;
+  }
+
+  /* FAB Adjustment */
+  .m3-fab.extended {
+    padding: 0.75rem 1.25rem;
+    font-size: 1rem;
+  }
+
+  /* Settings Grid */
+  .settings-grid {
+    grid-template-columns: 1fr;
   }
 }
