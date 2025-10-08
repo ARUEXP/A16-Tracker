@@ -33,6 +33,8 @@ let state = {
     rating: +item.rating || null,
     image: item.image || null,
     anilistId: item.anilistId || null,
+    // Add color for card background if available from API
+    color: item.color || null,
   })),
   settings: JSON.parse(localStorage.getItem(LS_SETTINGS_KEY) || "{}"),
 };
@@ -70,8 +72,71 @@ function initSettings() {
     toast(`Cleared ${count} AniList API cache entries.`, "success");
   });
 
-  // Data Management Buttons (Export/Import/Clear) - (Logic omitted for brevity but assumed functional)
-  // ... (Your previous logic for export/import/clear tracker data here)
+  $("#clearBtn")?.addEventListener("click", () => {
+    if (
+      confirm(
+        "Are you sure you want to delete ALL tracker data? This cannot be undone."
+      )
+    ) {
+      state.items = [];
+      localStorage.removeItem(LS_KEY);
+      toast("All tracker data cleared.", "danger");
+      renderTracker();
+    }
+  });
+
+  // Import/Export Logic
+  $("#exportBtn")?.addEventListener("click", () => {
+    const json = JSON.stringify(state.items, null, 2);
+    const blob = new Blob([json], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "anime_tracker_data.json";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast("Data exported successfully!", "success");
+  });
+
+  $("#importBtn")?.addEventListener("click", () => {
+    $("#importFile").click();
+  });
+
+  $("#importFile")?.addEventListener("change", (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const importedData = JSON.parse(e.target.result);
+        if (Array.isArray(importedData)) {
+          // Simple merge/replace strategy: replace old list with imported data
+          state.items = importedData.map((item) => ({
+            id: item.id || uid(),
+            title: item.title || "Untitled",
+            alt: item.alt || "",
+            total: +item.total || 0,
+            watched: +item.watched || 0,
+            status: item.status || "watching",
+            rating: +item.rating || null,
+            image: item.image || null,
+            anilistId: item.anilistId || null,
+            color: item.color || null,
+          }));
+          saveTracker();
+          toast("Data imported and saved!", "success");
+        } else {
+          toast("Invalid JSON format. Expected an array.", "danger");
+        }
+      } catch (error) {
+        toast("Failed to parse JSON file.", "danger");
+      }
+    };
+    reader.readAsText(file);
+  });
 }
 
 // --- Tracker & Stats Functions ---
@@ -123,6 +188,7 @@ function renderTracker() {
   const quickSearch = $("#quickSearch").value.toLowerCase();
   const statusFilter = $("#statusFilter").value;
   const sortBy = $("#sortBy").value;
+  const onlyPoster = $("#onlyPoster").checked;
 
   let filteredItems = state.items.filter((item) => {
     const matchesSearch =
@@ -133,7 +199,7 @@ function renderTracker() {
     return matchesSearch && matchesStatus;
   });
 
-  // Sorting logic...
+  // Sorting logic
   switch (sortBy) {
     case "alpha":
       filteredItems.sort((a, b) => a.title.localeCompare(b.title));
@@ -148,74 +214,301 @@ function renderTracker() {
       break;
     case "created":
       filteredItems.sort((a, b) => (a.id > b.id ? -1 : 1));
-      break; // Assuming IDs are created chronologically
+      break;
   }
 
   renderStats(filteredItems);
 
   trackerGrid.innerHTML = filteredItems
-    .map(
-      (item) => `
-    <div class="m3-card card" data-id="${item.id}" data-watched="${
+    .map((item) => {
+      // If "Only Posters" is checked and item has no image, skip it
+      if (onlyPoster && !item.image) return "";
+
+      const isCompleted =
+        item.watched >= (item.total || Infinity) && item.status !== "plan";
+      const cardClass = `m3-card card ${isCompleted ? "completed-card" : ""}`;
+
+      return `
+        <div class="${cardClass}" data-id="${item.id}" data-watched="${
         item.watched
       }" data-total="${item.total}" data-status="${
         item.status
-      }" style="--card-color: ${item.color || "#1a1a1a"};">
-        <div class="poster" onclick="editAnime('${item.id}')">
-            ${
-              item.image
-                ? `<img src="${item.image}" alt="${item.title}">`
-                : `<div class="no-poster">${item.title}</div>`
-            }
-            <div class="card-overlay">${item.watched}/${item.total}</div>
-        </div>
-        <div class="meta">
-            <h4 class="title" onclick="editAnime('${item.id}')">${
+      }" style="--card-color: ${
+        item.color || "#1a1a1a"
+      };" onclick="toggleBatchSelect(this, event)">
+            <div class="poster" onclick="editAnime('${item.id}')">
+                ${
+                  item.image
+                    ? `<img src="${item.image}" alt="${item.title}">`
+                    : `<div class="no-poster">${item.title}</div>`
+                }
+                <div class="card-overlay">${item.watched}/${item.total}</div>
+            </div>
+            <div class="meta">
+                <h4 class="title" onclick="editAnime('${item.id}')">${
         item.title
       }</h4>
-            <p class="sub">${item.status.toUpperCase()} ${
+                <p class="sub">${item.status.toUpperCase()} ${
         item.rating ? `| ★ ${item.rating}` : ""
       }</p>
-            <div class="pbar-text">
-                <span>Progress</span>
-                <span>${((item.watched / (item.total || 1)) * 100).toFixed(
-                  0
-                )}%</span>
-            </div>
-            <div class="pbar"><i style="width: ${Math.min(
-              100,
-              (item.watched / (item.total || 1)) * 100
-            )}%;"></i></div>
-            <div class="card-actions">
-                <button class="m3-icon-btn action-inc" data-id="${
-                  item.id
-                }" title="Watch Episode"><i class="mdi mdi-plus-circle"></i></button>
-                <button class="m3-icon-btn action-dec" data-id="${
-                  item.id
-                }" title="Rewind Episode"><i class="mdi mdi-minus-circle"></i></button>
-                <button class="m3-icon-btn action-del" data-id="${
-                  item.id
-                }" title="Delete"><i class="mdi mdi-trash-can-outline"></i></button>
+                <div class="pbar-text">
+                    <span>Progress</span>
+                    <span>${((item.watched / (item.total || 1)) * 100).toFixed(
+                      0
+                    )}%</span>
+                </div>
+                <div class="pbar"><i style="width: ${Math.min(
+                  100,
+                  (item.watched / (item.total || 1)) * 100
+                )}%;"></i></div>
+                <div class="card-actions">
+                    <button class="m3-icon-btn action-inc" data-id="${
+                      item.id
+                    }" title="Watch Episode"><i class="mdi mdi-plus-circle"></i></button>
+                    <button class="m3-icon-btn action-dec" data-id="${
+                      item.id
+                    }" title="Rewind Episode"><i class="mdi mdi-minus-circle"></i></button>
+                    <button class="m3-icon-btn action-del" data-id="${
+                      item.id
+                    }" title="Delete"><i class="mdi mdi-trash-can-outline"></i></button>
+                </div>
             </div>
         </div>
-    </div>
-  `
-    )
+    `;
+    })
     .join("");
 
   trackerEmpty.style.display = filteredItems.length === 0 ? "flex" : "none";
 
-  // (Event listeners for buttons remain the same)
+  // Attach dynamic event listeners
+  trackerGrid.querySelectorAll(".action-inc").forEach((btn) =>
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      updateEpisode(btn.dataset.id, 1);
+    })
+  );
+  trackerGrid.querySelectorAll(".action-dec").forEach((btn) =>
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      updateEpisode(btn.dataset.id, -1);
+    })
+  );
+  trackerGrid.querySelectorAll(".action-del").forEach((btn) =>
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      deleteAnime(btn.dataset.id);
+    })
+  );
+
+  updateBatchActionsBar();
+}
+
+function updateEpisode(id, change) {
+  const item = state.items.find((i) => i.id === id);
+  if (!item) return;
+
+  item.watched = Math.max(0, item.watched + change);
+  if (
+    item.watched >= item.total &&
+    item.total > 0 &&
+    item.status === "watching"
+  ) {
+    item.status = "completed";
+    toast(`Completed: ${item.title}!`, "success");
+  } else if (item.watched < item.total && item.status === "completed") {
+    item.status = "watching";
+  }
+  saveTracker();
+}
+
+function deleteAnime(id) {
+  if (confirm("Are you sure you want to delete this anime entry?")) {
+    state.items = state.items.filter((i) => i.id !== id);
+    saveTracker();
+    toast("Entry deleted.", "danger");
+  }
+}
+
+function toggleBatchSelect(card, event) {
+  // Only toggle selection if not clicking on action buttons
+  if (event.target.closest(".card-actions, .poster")) return;
+  card.classList.toggle("selected");
+  updateBatchActionsBar();
+}
+
+function updateBatchActionsBar() {
+  const selected = $$("#trackerGrid .card.selected");
+  const batchBar = $(".batch-actions-bar");
+  if (batchBar) {
+    batchBar.style.display = selected.length > 0 ? "flex" : "none";
+    const chip = batchBar.querySelector(".m3-chip");
+    if (chip) chip.textContent = `${selected.length} Selected`;
+  }
+}
+
+$("#batchUpdateBtn")?.addEventListener("click", () => {
+  const selectedCards = $$("#trackerGrid .card.selected");
+  const status = $("#batchStatus").value;
+  const increment = +($("#batchIncrement").value || 0);
+
+  selectedCards.forEach((card) => {
+    const id = card.dataset.id;
+    const item = state.items.find((i) => i.id === id);
+    if (!item) return;
+
+    if (status !== "nochange") {
+      item.status = status;
+    }
+
+    if (increment > 0) {
+      item.watched = Math.min(item.total, item.watched + increment);
+    }
+  });
+
+  saveTracker();
+  toast(`Batch updated ${selectedCards.length} items.`, "success");
+  // Clear selection
+  selectedCards.forEach((card) => card.classList.remove("selected"));
+  $("#batchStatus").value = "nochange";
+  $("#batchIncrement").value = 0;
+});
+
+// --- Modal & Form Handlers ---
+$("#addBtn")?.addEventListener("click", () => openModal());
+$("#modalClose")?.addEventListener("click", () => closeModal());
+$("#cancelBtn")?.addEventListener("click", () => closeModal());
+
+function openModal(item) {
+  const modal = $("#modal");
+  const form = $("#animeForm");
+  const isEdit = !!item;
+
+  if (isEdit) {
+    $("#modalTitle").textContent = "Edit Anime";
+    form.dataset.id = item.id;
+    $("#title").value = item.title;
+    $("#alt").value = item.alt;
+    $("#total").value = item.total;
+    $("#watched").value = item.watched;
+    $("#status").value = item.status;
+    $("#rating").value = item.rating || "";
+    $("#image").value = item.image || "";
+  } else {
+    $("#modalTitle").textContent = "Add New Anime";
+    form.reset();
+    form.dataset.id = "";
+    $("#total").value = getSetting("defaultEpisodes", 12);
+    $("#watched").value = 0;
+  }
+
+  modal.showModal();
+}
+
+function closeModal() {
+  $("#modal").close();
+  $("#animeForm").reset();
 }
 
 function editAnime(id) {
-  // ... (Your modal logic here)
+  const item = state.items.find((i) => i.id === id);
+  if (item) openModal(item);
 }
-// (All other form and button handlers remain the same)
+
+$("#animeForm")?.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const form = e.target;
+  const data = Object.fromEntries(new FormData(form));
+  const id = form.dataset.id;
+
+  // Check if the item is being edited (has an ID)
+  const isEdit = !!id;
+
+  // Sanitize and validate
+  const total = +data.total;
+  const watched = +data.watched;
+  const rating = +data.rating || null;
+
+  if (watched > total && total > 0) {
+    return toast("Watched episodes cannot exceed Total episodes!", "danger");
+  }
+
+  const newItem = {
+    id: isEdit ? id : uid(),
+    title: data.title.trim(),
+    alt: data.alt.trim(),
+    total: total,
+    watched: watched,
+    status: data.status,
+    rating: rating,
+    image: data.image.trim() || null,
+    // Preserve anilistId and color if editing
+    anilistId: isEdit ? state.items.find((i) => i.id === id)?.anilistId : null,
+    color: isEdit ? state.items.find((i) => i.id === id)?.color : null,
+  };
+
+  if (isEdit) {
+    const index = state.items.findIndex((i) => i.id === id);
+    if (index !== -1) {
+      state.items[index] = newItem;
+      toast("Anime updated!", "success");
+    }
+  } else {
+    state.items.push(newItem);
+    toast("Anime added!", "success");
+  }
+
+  closeModal();
+  saveTracker();
+});
+
+$("#autoCoverBtn")?.addEventListener("click", async (e) => {
+  e.preventDefault();
+  const title = $("#title").value;
+  if (!title.trim()) {
+    return toast("Enter a title first to auto-fill cover.", "danger");
+  }
+
+  const query = `
+        query ($search: String) {
+            Page(page: 1, perPage: 1) {
+                media(search: $search, type: ANIME) {
+                    coverImage { large color }
+                    id
+                }
+            }
+        }
+    `;
+  const variables = { search: title };
+
+  try {
+    const result = await anilistQuery(query, variables);
+    const media = result.data.Page.media[0];
+
+    if (media) {
+      $("#image").value = media.coverImage.large;
+      // When auto-filling, we need to save the anilistId and color for later
+      const formId = $("#animeForm").dataset.id;
+      const item = formId ? state.items.find((i) => i.id === formId) : null;
+
+      if (item) {
+        item.anilistId = media.id;
+        item.color = media.coverImage.color;
+      } else {
+        // For new entries, we can't save state yet, but we'll use these in the submit handler
+        // For now, only set the image. The anilistId and color will be saved if an existing item is edited.
+      }
+
+      toast("Cover image found and filled!", "success");
+    } else {
+      toast("No cover image found for that title.", "danger");
+    }
+  } catch (error) {
+    toast("Failed to search AniList for cover.", "danger");
+  }
+});
 
 // --- AniList API & Caching ---
 async function anilistQuery(query, variables = {}, retries = 2) {
-  // (API fetch and caching logic remains the same)
   try {
     const cacheKey = `anilist_${JSON.stringify(variables)}`;
     const cache = JSON.parse(localStorage.getItem(cacheKey) || "null");
@@ -223,6 +516,7 @@ async function anilistQuery(query, variables = {}, retries = 2) {
     if (cache && Date.now() - cache.timestamp < CACHE_TTL) {
       return cache.data;
     }
+
     const res = await fetch(ANILIST_GRAPHQL, {
       method: "POST",
       headers: {
@@ -243,6 +537,7 @@ async function anilistQuery(query, variables = {}, retries = 2) {
 
     return data;
   } catch (error) {
+    // Fallback to cache if API fails
     const cache = JSON.parse(
       localStorage.getItem(`anilist_${JSON.stringify(variables)}`) || "null"
     );
@@ -260,7 +555,6 @@ async function anilistQuery(query, variables = {}, retries = 2) {
 
 // --- Discover/Search Functions & Logic ---
 function createSkeletonCards(container, count) {
-  // (Skeleton card rendering logic remains the same)
   container.innerHTML = Array(count)
     .fill(0)
     .map(
@@ -286,7 +580,6 @@ function getDiscoverFilters() {
 }
 
 async function loadDiscover() {
-  // (Core logic for fetching unique data for each grid remains the same)
   const filters = getDiscoverFilters();
   const { limit, season, year, genre } = filters;
   const trendingGrid = $("#trendingGrid");
@@ -310,8 +603,8 @@ async function loadDiscover() {
     query ($page: Int, $perPage: Int, $sort: [MediaSort]) {
       Page(page: $page, perPage: $perPage) {
         media(type: ANIME, sort: $sort, ${buildFilterStr()}) {
-          id title { romaji native english } coverImage { large extraLarge color } 
-          bannerImage episodes status season seasonYear averageScore popularity genres studios { nodes { name } }
+          id title { romaji native english } coverImage { large color } 
+          episodes status season seasonYear averageScore popularity genres
         }
       }
     }
@@ -338,7 +631,6 @@ async function loadDiscover() {
       anilistQuery(baseQuery, topVars),
     ]);
 
-    // Render each grid separately with its unique data
     trendingGrid.innerHTML = "";
     trending.data.Page.media.forEach(renderDiscoverCard(trendingGrid));
 
@@ -352,13 +644,15 @@ async function loadDiscover() {
     top.data.Page.media.forEach(renderDiscoverCard(topGrid));
   } catch (error) {
     [trendingGrid, popularGrid, newGrid, topGrid].forEach((grid) => {
-      grid.innerHTML = '<div class="empty">Failed to load data.</div>';
+      grid.innerHTML =
+        '<div class="empty-state"><p>Failed to load data. Try clearing API cache in Settings.</p></div>';
     });
   }
 }
 
+$("#refreshDiscover")?.addEventListener("click", loadDiscover);
+
 function renderDiscoverCard(grid) {
-  // (Card rendering logic remains the same)
   return (item) => {
     const card = document.createElement("div");
     card.className = "m3-card card discover-card";
@@ -366,7 +660,9 @@ function renderDiscoverCard(grid) {
     card.style.setProperty("--card-color", item.coverImage.color || "#1a1a1a");
 
     const title = item.title.english || item.title.romaji || item.title.native;
-    const score = item.averageScore ? `★ ${item.averageScore / 10}` : "N/A";
+    const score = item.averageScore
+      ? `★ ${(item.averageScore / 10).toFixed(1)}`
+      : "N/A";
     const subText = `${item.seasonYear || "??"} ${
       item.season || ""
     } | ${score}`;
@@ -382,11 +678,14 @@ function renderDiscoverCard(grid) {
       <div class="meta">
           <h4 class="title">${title}</h4>
           <p class="sub">${subText}</p>
-          <button class="m3-button primary small" onclick="addFromDiscover(this)" data-title="${title}" data-image="${
-      item.coverImage.large
-    }" data-anilist-id="${item.id}" data-episodes="${
-      item.episodes || getSetting("defaultEpisodes", 12)
-    }">
+          <button class="m3-button primary small" onclick="addFromDiscover(this)" 
+              data-title="${title.replace(/"/g, "&quot;")}" 
+              data-image="${item.coverImage.large}" 
+              data-anilist-id="${item.id}" 
+              data-color="${item.coverImage.color || ""}"
+              data-episodes="${
+                item.episodes || getSetting("defaultEpisodes", 12)
+              }">
               <i class="mdi mdi-plus"></i> Add
           </button>
       </div>
@@ -395,11 +694,95 @@ function renderDiscoverCard(grid) {
   };
 }
 
-function getSearchFilters() {
-  // (Filter retrieval logic remains the same)
+function addFromDiscover(btn) {
+  const id = uid();
+  const newItem = {
+    id: id,
+    title: btn.dataset.title,
+    alt: "",
+    total: +btn.dataset.episodes,
+    watched: 0,
+    status: "plan", // Default status for discovered items
+    rating: null,
+    image: btn.dataset.image,
+    anilistId: +btn.dataset.anilistId,
+    color: btn.dataset.color || null,
+  };
+
+  // Prevent adding duplicates
+  if (state.items.some((i) => i.anilistId === newItem.anilistId)) {
+    return toast("This anime is already in your tracker.", "danger");
+  }
+
+  state.items.push(newItem);
+  saveTracker();
+  toast(`Added "${newItem.title}" to 'Plan to Watch'!`, "success");
+
+  // Optional: open edit modal immediately after adding
+  // editAnime(id);
 }
 
-// (searchForm event listener remains the same)
+function getSearchFilters() {
+  return {
+    query: $("#searchQuery")?.value || "",
+    limit: +($("#searchLimit")?.value || 12),
+    season: $("#searchSeason")?.value || "all",
+    year: +($("#searchYear")?.value || 0),
+    genre: $("#searchGenre")?.value || "all",
+  };
+}
+
+$("#searchForm")?.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const filters = getSearchFilters();
+  const searchResults = $("#searchResults");
+
+  if (!filters.query.trim()) {
+    searchResults.innerHTML =
+      '<div class="empty-state"><p>Enter a query and hit search to find anime on AniList.</p></div>';
+    return;
+  }
+
+  createSkeletonCards(searchResults, filters.limit);
+
+  function buildFilterStr() {
+    let str = "";
+    if (filters.season && filters.season !== "all")
+      str += ` season: "${filters.season}",`;
+    if (filters.year) str += ` seasonYear: ${filters.year},`;
+    if (filters.genre && filters.genre !== "all")
+      str += ` genre_in: ["${filters.genre}"],`;
+    return str;
+  }
+
+  const query = `
+        query ($search: String, $perPage: Int) {
+            Page(page: 1, perPage: $perPage) {
+                media(search: $search, type: ANIME, ${buildFilterStr()}) {
+                    id title { romaji native english } coverImage { large color } 
+                    episodes status season seasonYear averageScore popularity genres
+                }
+            }
+        }
+    `;
+  const variables = { search: filters.query, perPage: filters.limit };
+
+  try {
+    const result = await anilistQuery(query, variables);
+    const media = result.data.Page.media;
+
+    searchResults.innerHTML = "";
+    if (media.length === 0) {
+      searchResults.innerHTML =
+        '<div class="empty-state"><p>No results found for your query and filters.</p></div>';
+    } else {
+      media.forEach(renderDiscoverCard(searchResults));
+    }
+  } catch (error) {
+    searchResults.innerHTML =
+      '<div class="empty-state"><p>Error fetching search results. Try clearing API cache in Settings.</p></div>';
+  }
+});
 
 // --- Tab Switching & Initialization ---
 $$("nav .tab").forEach((btn) => {
@@ -457,6 +840,12 @@ function initialize() {
 
   // Ensure the discover content loads when clicked for the first time
   $("#discoverTab")?.addEventListener("click", loadDiscover, { once: true });
+
+  // Initial listeners for tracker controls
+  $("#quickSearch")?.addEventListener("input", renderTracker);
+  $("#statusFilter")?.addEventListener("change", renderTracker);
+  $("#sortBy")?.addEventListener("change", renderTracker);
+  $("#onlyPoster")?.addEventListener("change", renderTracker);
 }
 
 initialize();
