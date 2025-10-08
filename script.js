@@ -2,6 +2,38 @@
 // God Tier A16 Anime Tracker v4.0 - FULL GOD TIER
 // =======================================
 document.addEventListener("DOMContentLoaded", () => {
+  // ---------- Initial Tab Setup ----------
+  function activateTab(tab) {
+    $$("nav .tab").forEach((b) => {
+      b.classList.remove("active");
+      b.setAttribute("aria-selected", "false");
+    });
+    const btn = $(`nav .tab[data-tab='${tab}']`);
+    if (btn) {
+      btn.classList.add("active");
+      btn.setAttribute("aria-selected", "true");
+    }
+    Object.values(tabPanels).forEach((sel) => {
+      const panel = $(sel);
+      if (panel) {
+        panel.classList.remove("active");
+        panel.style.display = "none";
+      }
+    });
+    const activePanel = $(tabPanels[tab]);
+    if (activePanel) {
+      activePanel.classList.add("active");
+      activePanel.style.display = "block";
+    }
+    if (tab === "tracker") renderTracker();
+    if (tab === "discover") loadDiscoverCategory();
+    if (tab === "search")
+      $("#searchResults").innerHTML =
+        '<div class="empty-state"><p>Enter a query and hit search to find anime.</p></div>';
+  }
+
+  // Set default tab on load
+  activateTab("tracker");
   // ---------- Tab Navigation ----------
   const tabPanels = {
     tracker: "#tracker",
@@ -12,22 +44,7 @@ document.addEventListener("DOMContentLoaded", () => {
   $$("nav .tab").forEach((btn) => {
     btn.addEventListener("click", () => {
       const tab = btn.dataset.tab;
-      $$("nav .tab").forEach((b) => {
-        b.classList.remove("active");
-        b.setAttribute("aria-selected", "false");
-      });
-      btn.classList.add("active");
-      btn.setAttribute("aria-selected", "true");
-      Object.values(tabPanels).forEach((sel) => {
-        const panel = $(sel);
-        if (panel) panel.classList.remove("active");
-      });
-      $(tabPanels[tab])?.classList.add("active");
-      if (tab === "tracker") renderTracker();
-      if (tab === "discover") loadDiscoverCategory();
-      if (tab === "search")
-        $("#searchResults").innerHTML =
-          '<div class="empty-state"><p>Enter a query and hit search to find anime.</p></div>';
+      activateTab(tab);
     });
   });
 
