@@ -2,6 +2,167 @@
 // God Tier A16 Anime Tracker v4.0 - FULL GOD TIER
 // =======================================
 document.addEventListener("DOMContentLoaded", () => {
+  // ---------- Tab Navigation ----------
+  const tabPanels = {
+    tracker: "#tracker",
+    discover: "#discover",
+    search: "#search",
+    settings: "#settings",
+  };
+  $$("nav .tab").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const tab = btn.dataset.tab;
+      $$("nav .tab").forEach((b) => {
+        b.classList.remove("active");
+        b.setAttribute("aria-selected", "false");
+      });
+      btn.classList.add("active");
+      btn.setAttribute("aria-selected", "true");
+      Object.values(tabPanels).forEach((sel) => {
+        const panel = $(sel);
+        if (panel) panel.classList.remove("active");
+      });
+      $(tabPanels[tab])?.classList.add("active");
+      if (tab === "tracker") renderTracker();
+      if (tab === "discover") loadDiscoverCategory();
+      if (tab === "search")
+        $("#searchResults").innerHTML =
+          '<div class="empty-state"><p>Enter a query and hit search to find anime.</p></div>';
+    });
+  });
+
+  // ---------- Multi-Category Discover ----------
+  function buildJikanQuery({ season, year, genre, limit, orderBy, sort }) {
+    let url = `https://api.jikan.moe/v4/anime?limit=${limit}`;
+    if (season && season !== "all") url += `&season=${season.toLowerCase()}`;
+    if (year) url += `&year=${year}`;
+    if (genre && genre !== "all") url += `&genres=${encodeURIComponent(genre)}`;
+    if (orderBy) url += `&order_by=${orderBy}`;
+    if (sort) url += `&sort=${sort}`;
+    return url;
+  }
+
+  function renderDiscoverCardGrid(grid, item) {
+    const card = document.createElement("div");
+    card.className = "m3-card card discover-card";
+    card.innerHTML = `<img src="${item.image}" alt="${item.title}"><h4>${item.title}</h4><p>${item.episodes} eps | ${item.score} ★</p><button class="addBtn">Add</button>`;
+    card.querySelector(".addBtn")?.addEventListener("click", () => {
+      state.items.push({
+        id: uid(),
+        title: item.title,
+        alt: "",
+        total: item.episodes,
+        watched: 0,
+        status: "watching",
+        rating: null,
+        image: item.image,
+        color: "#1a1a1a",
+      });
+      saveTracker();
+      toast("Added to tracker!", "success");
+    });
+    grid.appendChild(card);
+  }
+
+  function loadDiscoverCategory() {
+    const filters = {
+      season: $("#seasonFilter")?.value || "all",
+      year: +$("#yearFilter")?.value || 0,
+      genre: $("#genreFilter")?.value || "all",
+      limit: +$("#discoverLimit")?.value || 8,
+    };
+    const trendingGrid = $("#trendingGrid");
+    const popularGrid = $("#popularGrid");
+    const newGrid = $("#newGrid");
+    const topGrid = $("#topGrid");
+    [trendingGrid, popularGrid, newGrid, topGrid].forEach(
+      (grid) => (grid.innerHTML = "")
+    );
+    // Trending: popularity desc, airing
+    fetch(buildJikanQuery({ ...filters, orderBy: "popularity", sort: "desc" }))
+      .then((r) => r.json())
+      .then((r) => {
+        trendingGrid.innerHTML = "";
+        r.data
+          .filter((i) => i.status === "Currently Airing")
+          .forEach((item) =>
+            renderDiscoverCardGrid(trendingGrid, normalizeJikan(item))
+          );
+      });
+    // Popular: popularity desc
+    fetch(buildJikanQuery({ ...filters, orderBy: "popularity", sort: "desc" }))
+      .then((r) => r.json())
+      .then((r) => {
+        popularGrid.innerHTML = "";
+        r.data.forEach((item) =>
+          renderDiscoverCardGrid(popularGrid, normalizeJikan(item))
+        );
+      });
+    // New Releases: start_date desc
+    fetch(buildJikanQuery({ ...filters, orderBy: "start_date", sort: "desc" }))
+      .then((r) => r.json())
+      .then((r) => {
+        newGrid.innerHTML = "";
+        r.data.forEach((item) =>
+          renderDiscoverCardGrid(newGrid, normalizeJikan(item))
+        );
+      });
+    // Top Rated: score desc
+    fetch(buildJikanQuery({ ...filters, orderBy: "score", sort: "desc" }))
+      .then((r) => r.json())
+      .then((r) => {
+        topGrid.innerHTML = "";
+        r.data.forEach((item) =>
+          renderDiscoverCardGrid(topGrid, normalizeJikan(item))
+        );
+      });
+  }
+
+  $("#refreshDiscover")?.addEventListener("click", loadDiscoverCategory);
+
+  // ---------- Search Feature ----------
+  $("#searchForm")?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const filters = {
+      query: $("#searchQuery")?.value || "",
+      limit: +$("#searchLimit")?.value || 12,
+      season: $("#searchSeason")?.value || "all",
+      year: +$("#searchYear")?.value || 0,
+      genre: $("#searchGenre")?.value || "all",
+    };
+    const searchResults = $("#searchResults");
+    if (!filters.query.trim()) {
+      searchResults.innerHTML =
+        '<div class="empty-state"><p>Enter a query and hit search to find anime.</p></div>';
+      return;
+    }
+    searchResults.innerHTML = "";
+    let url = `https://api.jikan.moe/v4/anime?q=${encodeURIComponent(
+      filters.query
+    )}&limit=${filters.limit}`;
+    if (filters.season && filters.season !== "all")
+      url += `&season=${filters.season.toLowerCase()}`;
+    if (filters.year) url += `&year=${filters.year}`;
+    if (filters.genre && filters.genre !== "all")
+      url += `&genres=${encodeURIComponent(filters.genre)}`;
+    try {
+      const resp = await fetch(url);
+      if (!resp.ok) throw new Error("Jikan API error");
+      const data = await resp.json();
+      const media = data.data || [];
+      if (media.length === 0) {
+        searchResults.innerHTML =
+          '<div class="empty-state"><p>No results found for your query and filters.</p></div>';
+      } else {
+        media.forEach((item) =>
+          renderDiscoverCardGrid(searchResults, normalizeJikan(item))
+        );
+      }
+    } catch (error) {
+      searchResults.innerHTML =
+        '<div class="empty-state"><p>Error fetching search results from Jikan.</p></div>';
+    }
+  });
   const LS_KEY = "a16_v4_data";
   const LS_SETTINGS_KEY = "a16_v4_settings";
   const CACHE_TTL = 1000 * 60 * 60; // 1 hour
