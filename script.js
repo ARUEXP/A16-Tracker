@@ -1,9 +1,17 @@
-// =======================================
+// ===============================================
 // God Tier A16 Anime Tracker v4.0 - FULL GOD TIER
-// =======================================
+// ===============================================
 document.addEventListener("DOMContentLoaded", () => {
   // ---------- Initial Tab Setup ----------
+  const tabPanels = {
+    tracker: "#tracker",
+    discover: "#discover",
+    search: "#search",
+    settings: "#settings",
+  };
+
   function activateTab(tab) {
+    // Update tab buttons state
     $$("nav .tab").forEach((b) => {
       b.classList.remove("active");
       b.setAttribute("aria-selected", "false");
@@ -13,6 +21,8 @@ document.addEventListener("DOMContentLoaded", () => {
       btn.classList.add("active");
       btn.setAttribute("aria-selected", "true");
     }
+
+    // Update panel visibility
     Object.values(tabPanels).forEach((sel) => {
       const panel = $(sel);
       if (panel) {
@@ -25,6 +35,8 @@ document.addEventListener("DOMContentLoaded", () => {
       activePanel.classList.add("active");
       activePanel.style.display = "block";
     }
+
+    // Handle panel-specific initialization
     if (tab === "tracker") renderTracker();
     if (tab === "discover") loadDiscoverCategory();
     if (tab === "search")
@@ -32,26 +44,9 @@ document.addEventListener("DOMContentLoaded", () => {
         '<div class="empty-state"><p>Enter a query and hit search to find anime.</p></div>';
   }
 
-  // Hide all tab panels except tracker on load
-  Object.values(tabPanels).forEach((sel) => {
-    const panel = $(sel);
-    if (panel) {
-      panel.classList.remove("active");
-      panel.style.display = "none";
-    }
-  });
-  $(tabPanels["tracker"]).classList.add("active");
-  $(tabPanels["tracker"]).style.display = "block";
-  // Optionally, set the tracker tab button as active
-  $$("nav .tab").forEach((b) => b.classList.remove("active"));
-  $("#trackerTab").classList.add("active");
+  // Initialize tracker tab on load
+  activateTab("tracker");
   // ---------- Tab Navigation ----------
-  const tabPanels = {
-    tracker: "#tracker",
-    discover: "#discover",
-    search: "#search",
-    settings: "#settings",
-  };
   $$("nav .tab").forEach((btn) => {
     btn.addEventListener("click", () => {
       const tab = btn.dataset.tab;
